@@ -45,5 +45,21 @@ public class Venta {
     @Enumerated(EnumType.STRING)
     @Column(name = "estado", nullable = false, length = 20)
     private EstadoVenta estado;
+    
+    @OneToMany(mappedBy = "venta", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<AsientoVenta> asientos = new ArrayList<>();
+
+    @PrePersist
+    public void prePersist() {
+        if (fechaHora == null) {
+            fechaHora = LocalDateTime.now();
+        }
+    }
+
+    public void agregarAsiento(AsientoVenta asiento) {
+        asientos.add(asiento);
+        asiento.setVenta(this);
+    }
 }
 
