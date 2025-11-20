@@ -28,4 +28,3 @@ public class SesionUsuario implements Serializable {
 
     private List<PersonaDto> personas;
 }
-
