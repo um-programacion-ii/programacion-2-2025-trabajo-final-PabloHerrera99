@@ -1,9 +1,8 @@
 package com.um.trabajofinal.demo.security;
 
-import com.um.trabajofinal.demo.domain.Usuario;
-import com.um.trabajofinal.demo.repository.UsuarioRepository;
-import com.um.trabajofinal.demo.security.dto.AuthResponse;
-import com.um.trabajofinal.demo.security.dto.LoginRequest;
+import com.um.trabajofinal.demo.persistence.domain.Usuario;
+import com.um.trabajofinal.demo.persistence.repository.UsuarioRepository;
+import com.um.trabajofinal.demo.api.dto.AuthResponse;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;

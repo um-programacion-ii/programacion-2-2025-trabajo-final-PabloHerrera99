@@ -1,6 +1,6 @@
-package com.um.trabajofinal.demo.repository;
+package com.um.trabajofinal.demo.persistence.repository;
 
-import com.um.trabajofinal.demo.domain.Evento;
+import com.um.trabajofinal.demo.persistence.domain.Evento;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

@@ -1,4 +1,4 @@
-package com.um.trabajofinal.demo.domain;
+package com.um.trabajofinal.demo.persistence.domain;
 
 import jakarta.persistence.*;
 import lombok.*;

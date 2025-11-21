@@ -1,6 +1,6 @@
-package com.um.trabajofinal.demo.domain;
+package com.um.trabajofinal.demo.persistence.domain;
 
-import com.um.trabajofinal.demo.domain.enums.EstadoVenta;
+import com.um.trabajofinal.demo.persistence.domain.enums.EstadoVenta;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -62,4 +62,3 @@ public class Venta {
         asiento.setVenta(this);
     }
 }
-

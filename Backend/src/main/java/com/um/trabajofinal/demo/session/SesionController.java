@@ -1,8 +1,8 @@
 package com.um.trabajofinal.demo.session;
 
-import com.um.trabajofinal.demo.domain.Usuario;
-import com.um.trabajofinal.demo.repository.UsuarioRepository;
-import com.um.trabajofinal.demo.security.dto.SessionRequest;
+import com.um.trabajofinal.demo.persistence.domain.Usuario;
+import com.um.trabajofinal.demo.persistence.repository.UsuarioRepository;
+import com.um.trabajofinal.demo.api.dto.SessionRequest;
 import com.um.trabajofinal.demo.session.SesionUsuario;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

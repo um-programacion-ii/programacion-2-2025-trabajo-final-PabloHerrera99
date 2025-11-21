@@ -1,13 +1,12 @@
-package com.um.trabajofinal.demo.controllers;
+package com.um.trabajofinal.demo.api.controllers;
 
-import com.um.trabajofinal.demo.domain.Usuario;
+import com.um.trabajofinal.demo.persistence.domain.Usuario;
 import com.um.trabajofinal.demo.security.AuthService;
-import com.um.trabajofinal.demo.security.dto.AuthResponse;
-import com.um.trabajofinal.demo.security.dto.LoginRequest;
+import com.um.trabajofinal.demo.api.dto.AuthResponse;
+import com.um.trabajofinal.demo.api.dto.LoginRequest;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Controller;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Optional;

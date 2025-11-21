@@ -1,4 +1,4 @@
-package com.um.trabajofinal.demo.security.dto;
+package com.um.trabajofinal.demo.api.dto;
 
 import lombok.*;
 
