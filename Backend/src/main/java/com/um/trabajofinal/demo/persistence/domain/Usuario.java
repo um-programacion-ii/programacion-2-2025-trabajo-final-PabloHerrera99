@@ -1,6 +1,6 @@
-package com.um.trabajofinal.demo.domain;
+package com.um.trabajofinal.demo.persistence.domain;
 
-import com.um.trabajofinal.demo.domain.enums.RolUsuario;
+import com.um.trabajofinal.demo.persistence.domain.enums.RolUsuario;
 import jakarta.persistence.*;
 import lombok.*;
 

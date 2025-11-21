@@ -1,6 +1,6 @@
 package com.um.trabajofinal.demo.session;
 
-import com.um.trabajofinal.demo.domain.*;
+import com.um.trabajofinal.demo.persistence.domain.*;
 import com.um.trabajofinal.demo.session.dto.*;
 import com.um.trabajofinal.demo.session.enums.PasoFlujo;
 import lombok.*;
@@ -28,4 +28,3 @@ public class SesionUsuario implements Serializable {
 
     private List<PersonaDto> personas;
 }
-
