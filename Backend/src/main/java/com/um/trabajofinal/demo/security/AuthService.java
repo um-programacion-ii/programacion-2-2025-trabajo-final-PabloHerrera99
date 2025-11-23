@@ -19,7 +19,8 @@ public class AuthService {
 
     public Optional<Usuario> authenticate(String username, String password) {
         Optional<Usuario> user = usuarioRepository.findByUsername(username);
-        // En este mock, asumimos que la password está en claro; en prod usaríamos hash
+        boolean passwordMatches = user.map(u -> u.getPassword() != null && u.getPassword().equals(password)).orElse(false);
+        System.out.println("[DEBUG_AUTH] username=" + username + " found=" + user.isPresent() + " passwordMatches=" + passwordMatches);
         return user.filter(u -> u.getPassword() != null && u.getPassword().equals(password));
     }
 
