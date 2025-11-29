@@ -2,6 +2,9 @@ package com.um.trabajofinal.demo.service.asiento;
 
 import com.um.trabajofinal.demo.api.dto.AsientoDto;
 import com.um.trabajofinal.demo.api.dto.SeatAvailabilityDto;
+import com.um.trabajofinal.demo.exception.EventoNotFoundException;
+import com.um.trabajofinal.demo.exception.ReservationExpiredException;
+import com.um.trabajofinal.demo.exception.SeatNotAvailableException;
 import com.um.trabajofinal.demo.persistence.domain.AsientoVenta;
 import com.um.trabajofinal.demo.persistence.domain.Evento;
 import com.um.trabajofinal.demo.persistence.domain.Venta;
@@ -40,7 +43,7 @@ public class AsientoVentaServiceImpl implements AsientoVentaService {
     public List<AsientoDto> holdSeats(Long eventoId, List<String> asientos, Long usuarioId) {
         // Validar evento existe
         Evento evento = eventoRepository.findById(eventoId)
-                .orElseThrow(() -> new RuntimeException("Evento no encontrado"));
+                .orElseThrow(() -> new EventoNotFoundException("Evento con ID " + eventoId + " no encontrado"));
 
         // Limpiar reservas expiradas primero
         releaseExpiredReservations();
@@ -76,7 +79,7 @@ public class AsientoVentaServiceImpl implements AsientoVentaService {
                 
                 asientosReservados.add(asientoDto);
             } else {
-                throw new RuntimeException("Asiento " + asientoStr + " no está disponible");
+                throw new SeatNotAvailableException("Asiento " + asientoStr + " no está disponible");
             }
         }
 
@@ -109,7 +112,7 @@ public class AsientoVentaServiceImpl implements AsientoVentaService {
             // Verificar que el asiento esté reservado
             ReservaTemporalInfo reserva = reservasTemporales.get(claveReserva);
             if (reserva == null || reserva.getExpiracion().isBefore(LocalDateTime.now())) {
-                throw new RuntimeException("Asiento " + asientoStr + " no está reservado o la reserva expiró");
+                throw new ReservationExpiredException("Asiento " + asientoStr + " no está reservado o la reserva expiró");
             }
             
             // Crear AsientoVenta permanente
@@ -138,7 +141,7 @@ public class AsientoVentaServiceImpl implements AsientoVentaService {
     public SeatAvailabilityDto getAvailableSeats(Long eventoId) {
         // Obtener evento
         Evento evento = eventoRepository.findById(eventoId)
-                .orElseThrow(() -> new RuntimeException("Evento no encontrado"));
+                .orElseThrow(() -> new EventoNotFoundException("Evento con ID " + eventoId + " no encontrado"));
 
         // Limpiar reservas expiradas
         releaseExpiredReservations();
