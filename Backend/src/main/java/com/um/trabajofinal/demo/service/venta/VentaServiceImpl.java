@@ -2,6 +2,7 @@ package com.um.trabajofinal.demo.service.venta;
 
 import com.um.trabajofinal.demo.api.dto.AsientoDto;
 import com.um.trabajofinal.demo.api.dto.VentaDto;
+import com.um.trabajofinal.demo.exception.EventoNotFoundException;
 import com.um.trabajofinal.demo.persistence.domain.AsientoVenta;
 import com.um.trabajofinal.demo.persistence.domain.Evento;
 import com.um.trabajofinal.demo.persistence.domain.Usuario;
@@ -44,7 +45,7 @@ public class VentaServiceImpl implements VentaService {
         
         // Validar evento
         Evento evento = eventoRepository.findById(ventaDto.getEventoId())
-                .orElseThrow(() -> new RuntimeException("Evento no encontrado"));
+                .orElseThrow(() -> new EventoNotFoundException("Evento con ID " + ventaDto.getEventoId() + " no encontrado"));
 
         // Crear venta
         Venta venta = Venta.builder()
