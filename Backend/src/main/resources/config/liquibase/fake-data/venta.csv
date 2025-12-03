@@ -1,0 +1,11 @@
+id;id_venta_catedra;fecha_venta;precio_total;exitosa;descripcion;estado_sincronizacion;evento_id;usuario_id
+1;16497;2025-12-03T07:40:15;15955.72;false;yet boo zowie;PENDIENTE;1;1
+2;22227;2025-12-03T16:43:35;26456.98;false;intermesh yahoo under;ERROR;2;2
+3;28364;2025-12-03T16:03:49;19227.21;false;rosemary;SINCRONIZADA;3;2
+4;15867;2025-12-03T00:03:08;1632.08;false;blah however scarily;PENDIENTE;4;1
+5;19051;2025-12-03T15:33:34;3251.52;false;um;PENDIENTE;5;1
+6;5009;2025-12-03T11:07:54;98.2;false;fill minor;SINCRONIZADA;6;2
+7;13253;2025-12-03T13:30:13;25664.22;true;ugh brr phew;PENDIENTE;7;2
+8;21603;2025-12-03T08:41:17;6561.5;true;meanwhile than;ERROR;8;2
+9;30776;2025-12-03T09:49:00;24298.19;true;loaf that ah;ERROR;9;1
+10;15940;2025-12-03T16:07:43;20536.34;true;limply geez calmly;ERROR;10;1

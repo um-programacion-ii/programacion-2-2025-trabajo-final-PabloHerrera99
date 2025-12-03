@@ -1,0 +1,67 @@
+{
+  "annotations": {
+    "changelogDate": "20251203202903"
+  },
+  "applications": "*",
+  "documentation": "Entidad 6: Venta\\nRegistro de intentos de venta (exitosos y fallidos)\\nMantiene estado de sincronización con servidor de cátedra",
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "idVentaCatedra",
+      "fieldType": "Long"
+    },
+    {
+      "fieldName": "fechaVenta",
+      "fieldType": "Instant",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "precioTotal",
+      "fieldType": "BigDecimal",
+      "fieldValidateRules": ["required", "min"],
+      "fieldValidateRulesMin": "0"
+    },
+    {
+      "fieldName": "exitosa",
+      "fieldType": "Boolean",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "descripcion",
+      "fieldType": "String",
+      "fieldValidateRules": ["maxlength"],
+      "fieldValidateRulesMaxlength": "500"
+    },
+    {
+      "fieldName": "estadoSincronizacion",
+      "fieldType": "EstadoSincronizacion",
+      "fieldTypeDocumentation": "Estados de sincronización con el servidor de la cátedra",
+      "fieldValidateRules": ["required"],
+      "fieldValues": "PENDIENTE,SINCRONIZADA,ERROR"
+    }
+  ],
+  "jpaMetamodelFiltering": true,
+  "name": "Venta",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "otherEntityField": "titulo",
+      "otherEntityName": "evento",
+      "relationshipName": "evento",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one",
+      "relationshipValidateRules": "required"
+    },
+    {
+      "otherEntityField": "login",
+      "otherEntityName": "user",
+      "relationshipName": "usuario",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one",
+      "relationshipValidateRules": "required",
+      "relationshipWithBuiltInEntity": true
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

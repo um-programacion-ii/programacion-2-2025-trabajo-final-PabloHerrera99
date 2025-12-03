@@ -1,0 +1,273 @@
+/**
+ * ============================================================================
+ * JDL - Sistema de Gestión de Eventos
+ * ============================================================================
+ * Proyecto: Final Programación 2025
+ * Descripción: Modelo de datos para sistema de venta de entradas a eventos
+ * Autor: Pablo
+ * Fecha: 2025-12-03
+ * ============================================================================
+ */
+
+// ============================================================================
+// ENUMERACIONES
+// ============================================================================
+
+/**
+ * Estados posibles de una sesión de usuario
+ */
+enum EstadoSesion {
+  SELECCION_EVENTO,      // Usuario está viendo lista de eventos
+  SELECCION_ASIENTOS,    // Usuario está seleccionando asientos
+  CARGA_DATOS,           // Usuario está cargando nombres de personas
+  COMPLETADO             // Sesión completada (compra realizada)
+}
+
+/**
+ * Estados de sincronización con el servidor de la cátedra
+ */
+enum EstadoSincronizacion {
+  PENDIENTE,      // Operación pendiente de sincronizar
+  SINCRONIZADA,   // Operación sincronizada exitosamente
+  ERROR           // Error en la sincronización
+}
+
+// ============================================================================
+// ENTIDADES
+// ============================================================================
+
+/**
+ * Entidad 1: EventoTipo
+ * Tabla de catálogo con tipos de eventos (Conferencia, Teatro, Curso, etc.)
+ */
+entity EventoTipo {
+  nombre String required maxlength(50)
+  descripcion String maxlength(200)
+}
+
+/**
+ * Entidad 2: Evento
+ * Entidad principal que almacena información de eventos sincronizada
+ * desde el servidor de la cátedra
+ */
+entity Evento {
+  idCatedra Long unique                    // ID del evento en servidor cátedra
+  titulo String required maxlength(200)
+  resumen String maxlength(500)
+  descripcion TextBlob                     // Descripción completa del evento
+  fecha Instant required                   // Fecha y hora del evento
+  direccion String maxlength(300)
+  imagen String maxlength(1000)            // URL de la imagen
+  filaAsientos Integer min(1) max(100)     // Cantidad de filas de asientos
+  columnaAsientos Integer min(1) max(100)  // Cantidad de columnas de asientos
+  precioEntrada BigDecimal required min(0) // Precio de la entrada
+  activo Boolean                           // Indica si el evento está activo
+  fechaSincronizacion Instant              // Última sincronización con cátedra
+}
+
+/**
+ * Entidad 3: Integrante
+ * Presentadores, oradores, organizadores de un evento
+ */
+entity Integrante {
+  nombre String required maxlength(100)
+  apellido String required maxlength(100)
+  identificacion String maxlength(50)      // "Dr.", "Prof.", "Ing.", etc.
+}
+
+/**
+ * Entidad 4: Sesion
+ * Representa la sesión de un usuario durante el proceso de compra
+ * Permite recuperar el estado si el usuario cierra y vuelve a abrir la app
+ */
+entity Sesion {
+  estado EstadoSesion required             // Estado actual en el flujo de compra
+  fechaInicio Instant required             // Momento de inicio de la sesión
+  ultimaActividad Instant required         // Última actividad registrada
+  expiracion Instant required              // Momento de expiración (30 min)
+  activa Boolean required                  // Indica si la sesión está activa
+}
+
+/**
+ * Entidad 5: AsientoSeleccionado
+ * Asientos que el usuario ha seleccionado durante su sesión
+ * Máximo 4 asientos por sesión (validado en lógica de negocio)
+ */
+entity AsientoSeleccionado {
+  fila Integer required min(1)
+  columna Integer required min(1)
+  nombrePersona String maxlength(200)      // Nombre de la persona para este asiento
+}
+
+/**
+ * Entidad 6: Venta
+ * Registro de intentos de venta (exitosos y fallidos)
+ * Mantiene estado de sincronización con servidor de cátedra
+ */
+entity Venta {
+  idVentaCatedra Long                      // ID de venta asignado por cátedra
+  fechaVenta Instant required              // Fecha y hora de la venta
+  precioTotal BigDecimal required min(0)   // Precio total de la venta
+  exitosa Boolean required                 // Indica si la venta fue exitosa
+  descripcion String maxlength(500)        // Mensaje de resultado de cátedra
+  estadoSincronizacion EstadoSincronizacion required  // Estado de sync
+}
+
+/**
+ * Entidad 7: AsientoVendido
+ * Detalle de asientos incluidos en una venta completada
+ */
+entity AsientoVendido {
+  fila Integer required min(1)
+  columna Integer required min(1)
+  nombrePersona String required maxlength(200)
+  estado String maxlength(50)              // Estado devuelto por cátedra
+}
+
+// ============================================================================
+// RELACIONES
+// ============================================================================
+
+/**
+ * Relación: Evento -> EventoTipo
+ * Un evento pertenece a un tipo de evento
+ */
+relationship ManyToOne {
+  Evento{eventoTipo(nombre) required} to EventoTipo
+}
+
+/**
+ * Relación: Integrante -> Evento
+ * Cada integrante está asociado a un evento
+ */
+relationship ManyToOne {
+  Integrante{evento(titulo) required} to Evento
+}
+
+/**
+ * Relación: Sesion -> User
+ * Cada sesión pertenece a un usuario (entidad User de JHipster)
+ */
+relationship ManyToOne {
+  Sesion{usuario(login) required} to User with builtInEntity
+}
+
+/**
+ * Relación: Sesion -> Evento
+ * Cada sesión está asociada a un evento específico
+ */
+relationship ManyToOne {
+  Sesion{evento(titulo) required} to Evento
+}
+
+/**
+ * Relación: AsientoSeleccionado -> Sesion
+ * Cada asiento seleccionado pertenece a una sesión
+ */
+relationship ManyToOne {
+  AsientoSeleccionado{sesion required} to Sesion
+}
+
+/**
+ * Relación: Venta -> Evento
+ * Cada venta está asociada a un evento
+ */
+relationship ManyToOne {
+  Venta{evento(titulo) required} to Evento
+}
+
+/**
+ * Relación: Venta -> User
+ * Cada venta pertenece a un usuario
+ */
+relationship ManyToOne {
+  Venta{usuario(login) required} to User with builtInEntity
+}
+
+/**
+ * Relación: AsientoVendido -> Venta
+ * Cada asiento vendido pertenece a una venta
+ */
+relationship ManyToOne {
+  AsientoVendido{venta required} to Venta
+}
+
+// ============================================================================
+// CONFIGURACIÓN DE OPCIONES
+// ============================================================================
+
+/**
+ * Configuración de servicios:
+ * - Todas las entidades tendrán capa de servicio (serviceClass)
+ */
+service all with serviceClass
+
+/**
+ * Configuración de DTOs:
+ * - Todas las entidades usarán DTOs con MapStruct
+ * - Esto separa la capa de dominio de la capa de presentación
+ */
+dto all with mapstruct
+
+/**
+ * Configuración de paginación:
+ * - Evento: Paginado (puede haber muchos eventos)
+ * - Venta: Paginado (puede haber muchas ventas)
+ * - Resto: Sin paginación (datos relacionados, no se listan directamente)
+ */
+paginate Evento, Venta with pagination
+
+/**
+ * Configuración de filtros:
+ * - Evento: Filtrable (buscar por activo, tipo, fecha, etc.)
+ * - Sesion: Filtrable (buscar por usuario, estado, activa)
+ * - Venta: Filtrable (buscar por usuario, evento, exitosa, estado sync)
+ */
+filter Evento, Sesion, Venta
+
+// ============================================================================
+// NOTAS DE IMPLEMENTACIÓN
+// ============================================================================
+
+/**
+ * PRÓXIMOS PASOS DESPUÉS DE GENERAR LAS ENTIDADES:
+ * 
+ * 1. Generar entidades con: jhipster jdl entities.jdl
+ * 
+ * 2. Agregar lógica de negocio personalizada:
+ *    - EventoService: Sincronización con API de cátedra
+ *    - SesionService: Gestión de expiración y Redis
+ *    - VentaService: Integración con endpoint de venta de cátedra
+ * 
+ * 3. Crear endpoints REST personalizados:
+ *    - GET  /api/eventos/activos
+ *    - GET  /api/eventos/{id}/asientos
+ *    - POST /api/sesiones/iniciar
+ *    - POST /api/ventas/bloquear-asientos
+ * 
+ * 4. Configurar integración con Redis:
+ *    - Caché de sesiones de usuario
+ *    - Consulta de estado de asientos
+ * 
+ * 5. Implementar servicio proxy:
+ *    - Lectura de Redis de cátedra
+ *    - Consumer de Kafka para actualizaciones
+ * 
+ * 6. Agregar validaciones adicionales en código:
+ *    - Máximo 4 asientos por sesión
+ *    - Validar fechas de eventos
+ *    - Verificar disponibilidad antes de bloqueo
+ * 
+ * CAMPOS IMPORTANTES:
+ * 
+ * - Evento.idCatedra: Mapeo con servidor cátedra (UNIQUE para evitar duplicados)
+ * - Evento.activo: Soft delete para eventos expirados/cancelados
+ * - Sesion.expiracion: 30 minutos desde última actividad
+ * - Venta.estadoSincronizacion: Permite reintentos si falla sync con cátedra
+ * 
+ * VALIDACIONES EN NEGOCIO (NO EN JDL):
+ * 
+ * - Sesion: Max 4 AsientoSeleccionado por sesión
+ * - AsientoSeleccionado: fila/columna deben estar dentro del rango del evento
+ * - Venta: Solo se permite si sesion.estado == CARGA_DATOS y asientos tienen nombres
+ */
