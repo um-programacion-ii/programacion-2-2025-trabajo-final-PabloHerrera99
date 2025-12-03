@@ -1,0 +1,4 @@
+org.springframework.test.context.ContextCustomizerFactory = \
+    com.evento.backend.config.\
+    SqlTestContainersSpringContextCustomizerFactory,com.evento.backend.config.\
+    RedisTestContainersSpringContextCustomizerFactory

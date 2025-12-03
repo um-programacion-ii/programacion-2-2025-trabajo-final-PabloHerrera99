@@ -1,0 +1,40 @@
+{
+  "annotations": {
+    "changelogDate": "20251203202902"
+  },
+  "applications": "*",
+  "documentation": "Entidad 5: AsientoSeleccionado\\nAsientos que el usuario ha seleccionado durante su sesión\\nMáximo 4 asientos por sesión (validado en lógica de negocio)",
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "fila",
+      "fieldType": "Integer",
+      "fieldValidateRules": ["required", "min"],
+      "fieldValidateRulesMin": "1"
+    },
+    {
+      "fieldName": "columna",
+      "fieldType": "Integer",
+      "fieldValidateRules": ["required", "min"],
+      "fieldValidateRulesMin": "1"
+    },
+    {
+      "fieldName": "nombrePersona",
+      "fieldType": "String",
+      "fieldValidateRules": ["maxlength"],
+      "fieldValidateRulesMaxlength": "200"
+    }
+  ],
+  "name": "AsientoSeleccionado",
+  "relationships": [
+    {
+      "otherEntityName": "sesion",
+      "relationshipName": "sesion",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one",
+      "relationshipValidateRules": "required"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

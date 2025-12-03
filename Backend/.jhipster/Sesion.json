@@ -1,0 +1,60 @@
+{
+  "annotations": {
+    "changelogDate": "20251203202901"
+  },
+  "applications": "*",
+  "documentation": "Entidad 4: Sesion\\nRepresenta la sesión de un usuario durante el proceso de compra\\nPermite recuperar el estado si el usuario cierra y vuelve a abrir la app",
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "estado",
+      "fieldType": "EstadoSesion",
+      "fieldTypeDocumentation": "Estados posibles de una sesión de usuario",
+      "fieldValidateRules": ["required"],
+      "fieldValues": "SELECCION_EVENTO,SELECCION_ASIENTOS,CARGA_DATOS,COMPLETADO"
+    },
+    {
+      "fieldName": "fechaInicio",
+      "fieldType": "Instant",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "ultimaActividad",
+      "fieldType": "Instant",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "expiracion",
+      "fieldType": "Instant",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "activa",
+      "fieldType": "Boolean",
+      "fieldValidateRules": ["required"]
+    }
+  ],
+  "jpaMetamodelFiltering": true,
+  "name": "Sesion",
+  "relationships": [
+    {
+      "otherEntityField": "login",
+      "otherEntityName": "user",
+      "relationshipName": "usuario",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one",
+      "relationshipValidateRules": "required",
+      "relationshipWithBuiltInEntity": true
+    },
+    {
+      "otherEntityField": "titulo",
+      "otherEntityName": "evento",
+      "relationshipName": "evento",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one",
+      "relationshipValidateRules": "required"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

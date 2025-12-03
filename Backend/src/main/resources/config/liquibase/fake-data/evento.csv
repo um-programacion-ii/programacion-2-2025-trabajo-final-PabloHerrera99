@@ -1,0 +1,11 @@
+id;id_catedra;titulo;resumen;descripcion;fecha;direccion;imagen;fila_asientos;columna_asientos;precio_entrada;activo;fecha_sincronizacion;evento_tipo_id
+1;774;whenever oof;puny;../fake-data/blob/hipster.txt;2025-12-02T23:30:47;rough pull;which;94;22;557.44;true;2025-12-02T23:00:50;1
+2;11497;tapioca tentacle failing;unless where;../fake-data/blob/hipster.txt;2025-12-03T18:07:08;psst reschedule think;behind upset;2;10;16383.62;true;2025-12-03T14:11:22;2
+3;22350;upon though;gleefully;../fake-data/blob/hipster.txt;2025-12-03T16:45:09;ah;tenement steeple unaccountably;98;91;17442.89;false;2025-12-02T22:09:04;3
+4;17099;woot who;disgorge afore;../fake-data/blob/hipster.txt;2025-12-03T03:46:00;quarrelsomely;after tomography;67;54;24087.78;true;2025-12-03T19:43:08;4
+5;9535;fluffy;fearless;../fake-data/blob/hipster.txt;2025-12-03T11:21:52;badly though extremely;blah;38;28;6943.25;false;2025-12-03T02:23:14;5
+6;16959;infatuated unto;now regarding restfully;../fake-data/blob/hipster.txt;2025-12-03T15:58:23;ham mmm;because geez;87;60;9438.28;true;2025-12-02T21:18:17;6
+7;17849;yet;apropos underneath gadzooks;../fake-data/blob/hipster.txt;2025-12-02T22:22:50;switchboard;accompanist avow;7;17;3170.39;true;2025-12-03T17:28:47;7
+8;19309;famously;trash kooky;../fake-data/blob/hipster.txt;2025-12-03T15:06:59;er cycle;mid;90;1;18400;false;2025-12-03T10:55:00;8
+9;16479;endow focalise;since;../fake-data/blob/hipster.txt;2025-12-02T23:38:12;intend yum;implode unfortunate wherever;41;42;4801.61;true;2025-12-03T11:38:07;9
+10;30584;rebel;fixed until;../fake-data/blob/hipster.txt;2025-12-03T10:59:19;rag showboat;procrastinate er;100;85;21461.09;false;2025-12-03T00:01:55;10
