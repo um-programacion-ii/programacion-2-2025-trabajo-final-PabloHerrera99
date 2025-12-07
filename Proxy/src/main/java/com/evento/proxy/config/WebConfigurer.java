@@ -60,6 +60,21 @@ public class WebConfigurer implements ServletContextInitializer {
         return new CorsFilter(source);
     }
 
+    @Bean
+    public org.springframework.web.client.RestTemplate restTemplate() {
+        // Configurar timeouts (opcional, pero recomendado)
+        org.springframework.http.client.SimpleClientHttpRequestFactory factory =
+            new org.springframework.http.client.SimpleClientHttpRequestFactory();
+
+        // Timeout de conexión: 5 segundos
+        factory.setConnectTimeout(5000);
+
+        // Timeout de lectura: 5 segundos
+        factory.setReadTimeout(5000);
+
+        return new org.springframework.web.client.RestTemplate(factory);
+    }
+
     private boolean h2ConsoleIsEnabled(Environment env) {
         return (
             env.acceptsProfiles(Profiles.of(JHipsterConstants.SPRING_PROFILE_DEVELOPMENT)) &&

@@ -124,3 +124,6 @@ application:
       host: 192.168.194.250
       port: 6379
       timeout: 2000
+  backend:
+    base-url: http://localhost:8081
+    timeout: 5000
