@@ -62,7 +62,16 @@ spring:
     cache-duration: PT1S # 1 second, see the ISO 8601 standard
   thymeleaf:
     cache: false
-
+  kafka:
+    bootstrap-servers: 192.168.194.250:9092
+    consumer:
+      group-id: grupo-pablo-herrera-2025
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
+        client.dns.lookup: use_all_dns_ips
 server:
   port: 8082
   # make sure requests the proxy uri instead of the server one
@@ -115,3 +124,6 @@ application:
       host: 192.168.194.250
       port: 6379
       timeout: 2000
+  backend:
+    base-url: http://localhost:8081
+    timeout: 5000
