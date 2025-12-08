@@ -35,34 +35,28 @@ public class BackendNotificationService {
      * 3. Sincronizar todos los datos relacionados (asientos, ventas, etc.)
      */
     public void notificarSincronizacionCompleta() {
-        // 1. Construir URL del endpoint
         String backendUrl = applicationProperties.getBackend().getBaseUrl();
         String endpoint = backendUrl + "/api/eventos/sincronizar-todo";
 
-        // 2. Loguear inicio de notificación
-        log.info("🔄 Solicitando sincronización completa al Backend");
+        log.info("olicitando sincronización completa al Backend");
         log.debug("URL destino: {}", endpoint);
 
         try {
-            // 3. Preparar headers HTTP (sin body, solo POST vacío)
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
 
-            // 4. Crear request vacío
             HttpEntity<Void> request = new HttpEntity<>(headers);
 
-            // 5. Enviar POST al Backend
             ResponseEntity<Void> response = restTemplate.postForEntity(
                 endpoint,
                 request,
                 Void.class
             );
 
-            // 6. Verificar respuesta
             if (response.getStatusCode().is2xxSuccessful()) {
-                log.info("✅ Solicitud de sincronización completa enviada exitosamente (status: {})", response.getStatusCode());
+                log.info("Solicitud de sincronización completa enviada exitosamente (status: {})", response.getStatusCode());
             } else {
-                log.warn("⚠ Backend respondió con código no exitoso: {}", response.getStatusCode());
+                log.warn("Backend respondió con código no exitoso: {}", response.getStatusCode());
             }
 
         } catch (ResourceAccessException e) {

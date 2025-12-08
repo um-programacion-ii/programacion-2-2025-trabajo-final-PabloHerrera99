@@ -17,16 +17,16 @@ public class EventoKafkaConsumer {
     @KafkaListener(topics = "eventos-actualizacion", groupId = "${spring.kafka.consumer.group-id}")
     public void consumirEventoActualizacion(String mensaje) {
         log.info("==================================================");
-        log.info("🔔 MENSAJE RECIBIDO DE KAFKA");
+        log.info("MENSAJE RECIBIDO DE KAFKA");
         log.info("Tópico: eventos-actualizacion");
         log.info("Contenido: {}", mensaje);
         log.info("==================================================");
         if (esMensajeGenerico(mensaje)) {
-            log.info("📢 Mensaje genérico detectado: Requiere sincronización completa");
+            log.info("Mensaje genérico detectado: Requiere sincronización completa");
             backendNotificationService.notificarSincronizacionCompleta();
-            log.info("✅ Solicitud de sincronización procesada");
+            log.info("Solicitud de sincronización procesada");
         } else {
-            log.warn("⚠️ Mensaje no reconocido (se esperaba: 'Cambios en los datos de eventos')");
+            log.warn("Mensaje no reconocido (se esperaba: 'Cambios en los datos de eventos')");
             log.warn("Mensaje recibido: {}", mensaje);
         }
     }
