@@ -1,5 +1,6 @@
 package com.evento.backend.repository;
 
+import com.evento.backend.domain.Evento;
 import com.evento.backend.domain.Integrante;
 import java.util.List;
 import java.util.Optional;
@@ -37,4 +38,6 @@ public interface IntegranteRepository extends JpaRepository<Integrante, Long> {
 
     @Query("select integrante from Integrante integrante left join fetch integrante.evento where integrante.id =:id")
     Optional<Integrante> findOneWithToOneRelationships(@Param("id") Long id);
+
+    void deleteByEvento(Evento evento);
 }

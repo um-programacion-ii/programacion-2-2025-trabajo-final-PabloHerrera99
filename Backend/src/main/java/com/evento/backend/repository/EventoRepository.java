@@ -37,4 +37,6 @@ public interface EventoRepository extends JpaRepository<Evento, Long>, JpaSpecif
 
     @Query("select evento from Evento evento left join fetch evento.eventoTipo where evento.id =:id")
     Optional<Evento> findOneWithToOneRelationships(@Param("id") Long id);
+
+    Optional<Evento> findByIdCatedra(Long idCatedra);
 }
