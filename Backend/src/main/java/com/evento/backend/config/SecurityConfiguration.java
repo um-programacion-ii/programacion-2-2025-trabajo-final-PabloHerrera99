@@ -73,6 +73,7 @@ public class SecurityConfiguration {
             .oauth2ResourceServer(oauth2 -> oauth2.jwt(withDefaults()));
         if (env.acceptsProfiles(Profiles.of(JHipsterConstants.SPRING_PROFILE_DEVELOPMENT))) {
             http.authorizeHttpRequests(authz -> authz.requestMatchers(antMatcher("/h2-console/**")).permitAll());
+            http.headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin()));
         }
         return http.build();
     }

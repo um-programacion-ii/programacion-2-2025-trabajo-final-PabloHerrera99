@@ -117,3 +117,12 @@ jhipster:
 # ===================================================================
 
 # application:
+
+# ===================================================================
+# Configuración del servidor de cátedra
+# ===================================================================
+catedra:
+  api:
+    base-url: http://192.168.194.250:8080
+    username: ${CATEDRA_USERNAME:pablo.herrera}
+    password: ${CATEDRA_PASSWORD:password123}
