@@ -12,3 +12,6 @@ services:
     extends:
       file: ./redis.yml
       service: redis
+
+volumes:
+  redis-data:
