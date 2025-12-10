@@ -126,3 +126,11 @@ catedra:
     base-url: http://192.168.194.250:8080
     username: ${CATEDRA_USERNAME:pablo.herrera}
     password: ${CATEDRA_PASSWORD:password123}
+
+# ===================================================================
+# Configuración del servicio Proxy
+# ===================================================================
+application:
+  proxy:
+    base-url: http://localhost:8082
+    timeout: 5000

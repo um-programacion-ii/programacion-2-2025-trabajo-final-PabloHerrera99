@@ -8,7 +8,7 @@ import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.exceptions.JedisException;
 
 /**
- * Service for consulting seat availability from Cátedra Redis server.
+ * Service para cosultar los asientos libres de la catesra.
  */
 @Service
 public class ConsultarAsientosService {
@@ -22,25 +22,20 @@ public class ConsultarAsientosService {
         this.jedisPool = jedisPool;
     }
 
-    /**
-     * Get seat map data for a specific event from Redis.
-     * 
-     * @param eventoId the ID of the event
-     * @return JSON string with seat data, or null if not found
-     */
+
     public String obtenerAsientos(Long eventoId) {
         String key = REDIS_KEY_PREFIX + eventoId;
-        
+
         try (Jedis jedis = jedisPool.getResource()) {
             log.debug("Consulting Redis for key: {}", key);
             String data = jedis.get(key);
-            
+
             if (data != null) {
                 log.debug("Found seat data for event {}", eventoId);
             } else {
                 log.debug("No seat data found for event {}", eventoId);
             }
-            
+
             return data;
         } catch (JedisException e) {
             log.error("Error connecting to Redis for event {}: {}", eventoId, e.getMessage());

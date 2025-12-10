@@ -53,8 +53,6 @@ public class EventoSyncService {
         this.integranteRepository = integranteRepository;
     }
 
-    // TODO: Agregar método synchronize()
-
     /**
      * Ejecuta la sincronización completa de eventos desde el API de cátedra.
      *
@@ -153,8 +151,6 @@ public class EventoSyncService {
 
         return result;
     }
-
-    // TODO: Agregar métodos auxiliares
 
     private EventoTipo findOrCreateEventoTipo(EventoTipoCatedraDTO dto) {
         if (dto == null || dto.getNombre() == null) {
@@ -278,7 +274,6 @@ public class EventoSyncService {
         return desactivados;
     }
 
-        // TODO: Agregar clase SyncResult
 
     public static class SyncResult {
         private int created = 0;
