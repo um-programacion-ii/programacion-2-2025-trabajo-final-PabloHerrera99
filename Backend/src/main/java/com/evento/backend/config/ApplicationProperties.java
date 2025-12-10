@@ -10,27 +10,43 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  */
 @ConfigurationProperties(prefix = "application", ignoreUnknownFields = false)
 public class ApplicationProperties {
-
     private final Liquibase liquibase = new Liquibase();
-
+    private final Proxy proxy = new Proxy();
     // jhipster-needle-application-properties-property
-
     public Liquibase getLiquibase() {
         return liquibase;
     }
-
+    public Proxy getProxy() {
+        return proxy;
+    }
     // jhipster-needle-application-properties-property-getter
-
     public static class Liquibase {
-
         private Boolean asyncStart = true;
-
         public Boolean getAsyncStart() {
             return asyncStart;
         }
-
         public void setAsyncStart(Boolean asyncStart) {
             this.asyncStart = asyncStart;
+        }
+    }
+    /**
+     * Configuración de conexión con el servicio Proxy
+     */
+    public static class Proxy {
+
+        private String baseUrl = "http://localhost:8082";
+        private Integer timeout = 5000;
+        public String getBaseUrl() {
+            return baseUrl;
+        }
+        public void setBaseUrl(String baseUrl) {
+            this.baseUrl = baseUrl;
+        }
+        public Integer getTimeout() {
+            return timeout;
+        }
+        public void setTimeout(Integer timeout) {
+            this.timeout = timeout;
         }
     }
     // jhipster-needle-application-properties-property-class

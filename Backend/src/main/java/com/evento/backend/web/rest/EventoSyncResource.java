@@ -9,9 +9,6 @@ import org.springframework.web.bind.annotation.*;
 
 /**
  * REST controller para manejar notificaciones de sincronización desde el Proxy.
- *
- * Este controller recibe notificaciones cuando el Proxy detecta cambios en eventos
- * desde Kafka. Por ahora solo loguea las solicitudes.
  */
 @RestController
 @RequestMapping("/api/eventos")
@@ -21,19 +18,9 @@ public class EventoSyncResource {
 
     private final EventoSyncService eventSyncService;  // NUEVO
 
-    // NUEVO: Constructor con inyección de dependencias
     public EventoSyncResource(EventoSyncService eventSyncService) {
         this.eventSyncService = eventSyncService;
     }
-    /**
-     * POST /api/eventos/sincronizar-todo : Recibe notificación de sincronización desde Proxy.
-     *
-     * Este endpoint es invocado por el Proxy cuando recibe un mensaje genérico de Kafka
-     * indicando "Cambios en los datos de eventos". El mensaje no especifica qué eventos
-     * cambiaron, por lo que requiere una sincronización completa.
-     *
-     * @return ResponseEntity con status 200 OK
-     */
     /**
      * POST /api/eventos/sincronizar-todo : Sincroniza eventos desde el API de cátedra.
      *
