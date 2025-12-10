@@ -21,24 +21,8 @@ public class EventoKafkaConsumer {
         log.info("Tópico: eventos-actualizacion");
         log.info("Contenido: {}", mensaje);
         log.info("==================================================");
-        if (esMensajeGenerico(mensaje)) {
-            log.info("Mensaje genérico detectado: Requiere sincronización completa");
-            backendNotificationService.notificarSincronizacionCompleta();
-            log.info("Solicitud de sincronización procesada");
-        } else {
-            log.warn("Mensaje no reconocido (se esperaba: 'Cambios en los datos de eventos')");
-            log.warn("Mensaje recibido: {}", mensaje);
+        log.info("Mensaje genérico detectado: Requiere sincronización completa");
+        backendNotificationService.notificarSincronizacionCompleta();
+        log.info("Solicitud de sincronización procesada");
         }
     }
-
-    private boolean esMensajeGenerico(String mensaje) {
-        if (mensaje == null || mensaje.isBlank()) {
-            return false;
-        }
-
-        String mensajeNormalizado = mensaje.trim();
-
-        // Detectar mensaje genérico de la cátedra
-        return mensajeNormalizado.equals("Cambios en los datos de eventos");
-    }
-}

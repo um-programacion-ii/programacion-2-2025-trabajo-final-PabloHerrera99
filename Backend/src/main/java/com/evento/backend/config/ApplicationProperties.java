@@ -1,5 +1,6 @@
 package com.evento.backend.config;
 
+import com.evento.backend.domain.Sesion;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
@@ -12,6 +13,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class ApplicationProperties {
     private final Liquibase liquibase = new Liquibase();
     private final Proxy proxy = new Proxy();
+    private final Sesion sesion = new Sesion();
+
     // jhipster-needle-application-properties-property
     public Liquibase getLiquibase() {
         return liquibase;
@@ -19,6 +22,10 @@ public class ApplicationProperties {
     public Proxy getProxy() {
         return proxy;
     }
+    public Sesion getSesion() {
+        return sesion;
+    }
+
     // jhipster-needle-application-properties-property-getter
     public static class Liquibase {
         private Boolean asyncStart = true;
@@ -47,6 +54,32 @@ public class ApplicationProperties {
         }
         public void setTimeout(Integer timeout) {
             this.timeout = timeout;
+        }
+    }
+
+    /**
+     * Configuración de gestión de sesiones en Redis
+     */
+    public static class Sesion {
+        private Integer ttlMinutos = 30;
+        private String keyPrefix = "sesion:usuario:";
+        public Integer getTtlMinutos() {
+            return ttlMinutos;
+        }
+        public void setTtlMinutos(Integer ttlMinutos) {
+            this.ttlMinutos = ttlMinutos;
+        }
+        public String getKeyPrefix() {
+            return keyPrefix;
+        }
+        public void setKeyPrefix(String keyPrefix) {
+            this.keyPrefix = keyPrefix;
+        }
+        /**
+         * Convierte el TTL de minutos a segundos para uso directo con Redis.
+         */
+        public long getTtlSegundos() {
+            return ttlMinutos * 60L;
         }
     }
     // jhipster-needle-application-properties-property-class

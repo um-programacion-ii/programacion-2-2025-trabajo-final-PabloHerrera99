@@ -38,7 +38,7 @@ public class BackendNotificationService {
         String backendUrl = applicationProperties.getBackend().getBaseUrl();
         String endpoint = backendUrl + "/api/eventos/sincronizar-todo";
 
-        log.info("olicitando sincronización completa al Backend");
+        log.info("Solicitando sincronización completa al Backend");
         log.debug("URL destino: {}", endpoint);
 
         try {

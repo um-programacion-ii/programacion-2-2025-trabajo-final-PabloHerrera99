@@ -134,3 +134,7 @@ application:
   proxy:
     base-url: http://localhost:8082
     timeout: 5000
+  # Configuración de gestión de sesiones
+  sesion:
+    ttl-minutos: 30        # Tiempo de vida de sesiones en minutos
+    key-prefix: "sesion:usuario:"  # Prefijo de keys en Redis
