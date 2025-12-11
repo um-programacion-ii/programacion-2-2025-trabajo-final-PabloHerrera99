@@ -485,6 +485,7 @@ public class SesionBusinessService {
      */
     public VentaDTO confirmarVenta(Long userId) {
         log.debug("Confirmando venta para usuario {}", userId);
+
         // 1. Obtener sesión desde Redis
         Optional<SesionRedisDTO> sesionRedisOpt = sesionRedisService.obtenerSesion(userId.toString());
         if (sesionRedisOpt.isEmpty()) {
@@ -496,6 +497,7 @@ public class SesionBusinessService {
         Sesion sesion = sesionRepository
             .findById(sesionRedis.getSesionId())
             .orElseThrow(() -> new BadRequestAlertException("Sesión no encontrada", "sesion", "sessionnotfound"));
+
         // 2. Validar estado
         if (sesion.getEstado() != EstadoSesion.CARGA_DATOS) {
             throw new BadRequestAlertException(
@@ -504,11 +506,13 @@ public class SesionBusinessService {
                 "invalidstate"
             );
         }
+
         // 3. Obtener asientos seleccionados desde PostgreSQL
         List<AsientoSeleccionado> asientosSeleccionados = asientoSeleccionadoRepository.findBySesionId(sesion.getId());
         if (asientosSeleccionados.isEmpty()) {
             throw new BadRequestAlertException("No hay asientos seleccionados", "sesion", "noasientos");
         }
+
         // 4. Validar que TODOS tienen nombre asignado
         for (AsientoSeleccionado asiento : asientosSeleccionados) {
             if (!validarNombreCompleto(asiento.getNombrePersona())) {
@@ -519,8 +523,10 @@ public class SesionBusinessService {
                 );
             }
         }
+
         // 5. Obtener evento
         Evento evento = sesion.getEvento();
+
 
         // 6. Calcular precio total (CORREGIDO: usar BigDecimal)
         BigDecimal precioTotal = evento.getPrecioEntrada().multiply(BigDecimal.valueOf(asientosSeleccionados.size()));
@@ -598,8 +604,10 @@ public class SesionBusinessService {
         }
         // 11. Procesar respuesta de venta
         if (Boolean.TRUE.equals(ventaResponse.getResultado())) {
+
             // ===== CASO A: VENTA EXITOSA =====
             log.info("Venta exitosa en cátedra con ID: {}", ventaResponse.getVentaId());
+
             // Crear Venta entity usando helper
             Venta venta = ventaCreationHelper.crearVentaExitosa(
                 sesion.getUsuario(),
@@ -608,6 +616,7 @@ public class SesionBusinessService {
                 precioTotal
             );
             venta = ventaRepository.save(venta);
+
             // Crear AsientoVendido entities
             List<AsientoVendido> asientosVendidos = new ArrayList<>();
             for (AsientoVentaResponseDTO asientoResp : ventaResponse.getAsientos()) {
@@ -619,19 +628,25 @@ public class SesionBusinessService {
                 asientosVendidos.add(asientoVendido);
             }
             asientoVendidoRepository.saveAll(asientosVendidos);
+
             // Actualizar sesión a COMPLETADO
             sesion.setEstado(EstadoSesion.COMPLETADO);
             sesionRepository.save(sesion);
+
             // Eliminar de Redis
             sesionRedisService.eliminarSesion(userId.toString());
+
             // Eliminar asientos seleccionados
             asientoSeleccionadoRepository.deleteBySesionId(sesion.getId());
             log.info("Venta confirmada exitosamente: ID cátedra {}, ID local {}", ventaResponse.getVentaId(), venta.getId());
+
             // Retornar VentaDTO usando mapper
             return ventaMapper.toDto(venta);
         } else {
+
             // ===== CASO B: VENTA RECHAZADA POR CÁTEDRA =====
             log.warn("Venta rechazada por cátedra: {}", ventaResponse.getDescripcion());
+
             // Crear Venta con estado ERROR (permite re-intento)
             Venta ventaFallida = ventaCreationHelper.crearVentaRechazada(
                 sesion.getUsuario(),
@@ -639,6 +654,7 @@ public class SesionBusinessService {
                 precioTotal
             );
             ventaRepository.save(ventaFallida);
+
             // NO actualizar sesión (mantener CARGA_DATOS para permitir re-intento)
             // NO eliminar de Redis
             throw new BadRequestAlertException(
