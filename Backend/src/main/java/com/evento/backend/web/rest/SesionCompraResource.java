@@ -90,9 +90,7 @@ public class SesionCompraResource {
 
     /**
      * {@code POST  /compra/actividad} : Actualiza la última actividad de la sesión (keep-alive).
-     *
-     * Extiende el tiempo de expiración en Redis.
-     *
+     * Extiende el tiempo de expiración en Redis
      * @return ResponseEntity vacío con código 200
      */
     @PostMapping("/actividad")
@@ -118,10 +116,8 @@ public class SesionCompraResource {
 
     /**
      * {@code POST  /compra/seleccionar-asientos} : Selecciona y bloquea asientos en el servidor de cátedra.
-     *
      * Valida disponibilidad y bloquea los asientos por 5 minutos.
      * Máximo 4 asientos por sesión.
-     *
      * @param request el DTO con la lista de asientos a seleccionar
      * @return ResponseEntity con el SesionDTO actualizado
      */
@@ -148,10 +144,8 @@ public class SesionCompraResource {
 
     /**
      * {@code POST  /compra/asignar-nombres} : Asigna nombres a los asientos seleccionados.
-     *
      * Valida que el nombre tenga al menos 3 caracteres.
      * Debe haber un nombre por cada asiento seleccionado.
-     *
      * @param request el DTO con el Map de nombres (key: "fila-columna", value: "Nombre Completo")
      * @return ResponseEntity con el SesionDTO actualizado
      */
