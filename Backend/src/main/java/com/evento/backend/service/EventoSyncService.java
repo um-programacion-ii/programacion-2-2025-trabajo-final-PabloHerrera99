@@ -1,6 +1,5 @@
 package com.evento.backend.service;
 
-import com.evento.backend.config.CatedraProperties;
 import com.evento.backend.domain.Evento;
 import com.evento.backend.domain.EventoTipo;
 import com.evento.backend.domain.Integrante;

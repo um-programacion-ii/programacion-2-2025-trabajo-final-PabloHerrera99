@@ -126,4 +126,3 @@ application:
       timeout: 2000
   backend:
     base-url: http://localhost:8081
-    timeout: 5000
