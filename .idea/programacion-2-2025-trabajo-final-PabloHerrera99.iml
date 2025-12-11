@@ -49,5 +49,6 @@
     <orderEntry type="library" name="Maven: org.redisson:redisson:3.46.0" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.security:spring-security-core:6.4.5" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.security:spring-security-oauth2-jose:6.4.5" level="project" />
+    <orderEntry type="library" name="Maven: org.mapstruct:mapstruct:1.6.3" level="project" />
   </component>
 </module>

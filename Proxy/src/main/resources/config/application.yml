@@ -233,3 +233,10 @@ jhipster:
 # ===================================================================
 
 # application:
+# ===================================================================
+# Configuración del Backend (para notificaciones desde Kafka)
+# ===================================================================
+application:
+  backend:
+    base-url: ${BACKEND_BASE_URL:http://localhost:8081}
+    timeout: 10000  # 10 segundos

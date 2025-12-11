@@ -26,6 +26,11 @@ public interface SesionMapper extends EntityMapper<SesionDTO, Sesion> {
     @Named("eventoTitulo")
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "id", source = "id")
+    @Mapping(target = "idCatedra", source = "idCatedra")
     @Mapping(target = "titulo", source = "titulo")
+    @Mapping(target = "fecha", source = "fecha")
+    @Mapping(target = "filaAsientos", source = "filaAsientos")
+    @Mapping(target = "columnaAsientos", source = "columnaAsientos")
+    @Mapping(target = "precioEntrada", source = "precioEntrada")
     EventoDTO toDtoEventoTitulo(Evento evento);
 }

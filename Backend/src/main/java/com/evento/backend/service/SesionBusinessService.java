@@ -4,7 +4,10 @@ import com.evento.backend.domain.*;
 import com.evento.backend.domain.enumeration.*;
 import com.evento.backend.repository.*;
 import com.evento.backend.service.dto.*;
+import com.evento.backend.service.helper.VentaCreationHelper;
 import com.evento.backend.service.mapper.SesionMapper;
+import com.evento.backend.service.mapper.SesionRedisMapper;
+import com.evento.backend.service.mapper.VentaCatedraMapper;
 import com.evento.backend.service.mapper.VentaMapper;
 import com.evento.backend.web.rest.errors.BadRequestAlertException;
 import java.math.BigDecimal;
@@ -46,6 +49,12 @@ public class SesionBusinessService {
     // Mappers
     private final SesionMapper sesionMapper;
     private final VentaMapper ventaMapper;
+    private final SesionRedisMapper sesionRedisMapper;
+    private final VentaCatedraMapper ventaCatedraMapper;
+
+    // Helpers
+    private final VentaCreationHelper ventaCreationHelper;
+
     public SesionBusinessService(
         SesionRedisService sesionRedisService,
         SesionRepository sesionRepository,
@@ -57,7 +66,10 @@ public class SesionBusinessService {
         AsientosDisponibilidadService asientosDisponibilidadService,
         CatedraClientService catedraClientService,
         SesionMapper sesionMapper,
-        VentaMapper ventaMapper
+        VentaMapper ventaMapper,
+        SesionRedisMapper sesionRedisMapper,
+        VentaCatedraMapper ventaCatedraMapper,
+        VentaCreationHelper ventaCreationHelper
     ) {
         this.sesionRedisService = sesionRedisService;
         this.sesionRepository = sesionRepository;
@@ -70,6 +82,9 @@ public class SesionBusinessService {
         this.catedraClientService = catedraClientService;
         this.sesionMapper = sesionMapper;
         this.ventaMapper = ventaMapper;
+        this.sesionRedisMapper = sesionRedisMapper;
+        this.ventaCatedraMapper = ventaCatedraMapper;
+        this.ventaCreationHelper = ventaCreationHelper;
     }
     // ========== MÉTODOS PÚBLICOS ==========
     /**
@@ -82,24 +97,40 @@ public class SesionBusinessService {
      */
     public SesionDTO iniciarSesion(Long userId, Long eventoId) {
         log.debug("Iniciando sesión para usuario {} en evento {}", userId, eventoId);
+
         // 1. Validar usuario existe
         User user = userRepository
             .findById(userId)
             .orElseThrow(() -> new BadRequestAlertException("Usuario no encontrado", "sesion", "usernotfound"));
+
         // 2. Validar evento existe
         Evento evento = eventoRepository
             .findById(eventoId)
             .orElseThrow(() -> new BadRequestAlertException("Evento no encontrado", "sesion", "eventonotfound"));
+
+        if (evento.getIdCatedra() == null) {
+            throw new BadRequestAlertException(
+                "No se puede iniciar sesión para este evento. " +
+                    "Solo eventos sincronizados con el servidor de cátedra permiten compra de asientos.",
+                "sesion",
+                "eventosinidcatedra"
+            );
+        }
+
         // 3. Buscar sesión activa previa del usuario
         Optional<Sesion> sesionActivaOpt = sesionRepository.findFirstByUsuarioIdAndEstadoNot(userId, EstadoSesion.COMPLETADO);
+
         // 4. Si existe sesión previa, cancelarla
         if (sesionActivaOpt.isPresent()) {
             Sesion sesionPrevia = sesionActivaOpt.get();
             log.info("Cancelando sesión previa {} del usuario {}", sesionPrevia.getId(), userId);
+
             // Eliminar asientos seleccionados
             asientoSeleccionadoRepository.deleteBySesionId(sesionPrevia.getId());
+
             // Eliminar de Redis
             sesionRedisService.eliminarSesion(userId.toString());
+
             // Marcar como completada
             sesionPrevia.setEstado(EstadoSesion.COMPLETADO);
             sesionRepository.save(sesionPrevia);
@@ -114,23 +145,15 @@ public class SesionBusinessService {
         nuevaSesion.setUltimaActividad(ahora);
         nuevaSesion.setExpiracion(ahora.plusSeconds(30 * 60)); // TTL 30 minutos
         nuevaSesion.setActiva(true);
+
         // 6. Guardar en PostgreSQL
         nuevaSesion = sesionRepository.save(nuevaSesion);
+
         // 7. Guardar en Redis
         SesionDTO sesionDTO = sesionMapper.toDto(nuevaSesion);
 
-        // Convertir SesionDTO a SesionRedisDTO
-        SesionRedisDTO sesionRedisDTO = new SesionRedisDTO();
-        sesionRedisDTO.setSesionId(sesionDTO.getId());
-        sesionRedisDTO.setEstado(sesionDTO.getEstado());
-        sesionRedisDTO.setUltimaActividad(sesionDTO.getUltimaActividad());
-        sesionRedisDTO.setExpiracion(Instant.now().plusSeconds(30 * 60)); // TTL 30 minutos
-        if (sesionDTO.getEvento() != null) {
-            sesionRedisDTO.setEventoId(sesionDTO.getEvento().getId());
-        }
-        if (sesionDTO.getUsuario() != null) {
-            sesionRedisDTO.setUserId(userId.toString());
-        }
+        // Convertir SesionDTO a SesionRedisDTO usando mapper
+        SesionRedisDTO sesionRedisDTO = sesionRedisMapper.toRedisDTO(sesionDTO);
 
         sesionRedisService.guardarSesion(userId.toString(), sesionRedisDTO);
         log.info("Sesión {} iniciada exitosamente para usuario {} en evento {}", nuevaSesion.getId(), userId, eventoId);
@@ -181,17 +204,7 @@ public class SesionBusinessService {
         // 4. Rehidratar Redis
         SesionDTO sesionDTO = sesionMapper.toDto(sesion);
 
-        SesionRedisDTO sesionRedisDTO = new SesionRedisDTO();
-        sesionRedisDTO.setSesionId(sesionDTO.getId());
-        sesionRedisDTO.setEstado(sesionDTO.getEstado());
-        sesionRedisDTO.setUltimaActividad(sesionDTO.getUltimaActividad());
-        sesionRedisDTO.setExpiracion(Instant.now().plusSeconds(30 * 60)); // TTL 30 minutos
-        if (sesionDTO.getEvento() != null) {
-            sesionRedisDTO.setEventoId(sesionDTO.getEvento().getId());
-        }
-        if (sesionDTO.getUsuario() != null) {
-            sesionRedisDTO.setUserId(userId.toString());
-        }
+        SesionRedisDTO sesionRedisDTO = sesionRedisMapper.toRedisDTO(sesionDTO);
 
         sesionRedisService.guardarSesion(userId.toString(), sesionRedisDTO);
         log.debug("Sesión {} rehidratada en Redis para usuario {}", sesion.getId(), userId);
@@ -298,6 +311,16 @@ public class SesionBusinessService {
         }
         // 5. Obtener evento desde PostgreSQL
         Evento evento = sesion.getEvento();
+
+        if (evento.getIdCatedra() == null) {
+            throw new BadRequestAlertException(
+                "Este evento no permite ventas (no sincronizado con servidor de cátedra). " +
+                    "Solo eventos importados desde la cátedra permiten compra de asientos.",
+                "sesion",
+                "eventonosincronizado"
+            );
+        }
+
         // 6. Validar coordenadas dentro de rango
         for (AsientoSimpleDTO asiento : asientos) {
             validarCoordenadasAsiento(evento, asiento.getFila(), asiento.getColumna());
@@ -366,17 +389,7 @@ public class SesionBusinessService {
         // 15. Actualizar en Redis
         SesionDTO sesionActualizada = sesionMapper.toDto(sesion);
 
-        SesionRedisDTO sesionRedisActualizada = new SesionRedisDTO();
-        sesionRedisActualizada.setSesionId(sesionActualizada.getId());
-        sesionRedisActualizada.setEstado(sesionActualizada.getEstado());
-        sesionRedisActualizada.setExpiracion(Instant.now().plusSeconds(30 * 60));
-        sesionRedisActualizada.setUltimaActividad(sesionActualizada.getUltimaActividad());
-        if (sesionActualizada.getEvento() != null) {
-            sesionRedisActualizada.setEventoId(sesionActualizada.getEvento().getId());
-        }
-        if (sesionActualizada.getUsuario() != null) {
-            sesionRedisActualizada.setUserId(sesionActualizada.getUsuario().getId().toString());
-        }
+        SesionRedisDTO sesionRedisActualizada = sesionRedisMapper.toRedisDTO(sesionActualizada);
 
         sesionRedisService.guardarSesion(userId.toString(), sesionRedisActualizada);
         log.info("Asientos seleccionados exitosamente para sesión {}: {} asientos", sesion.getId(), asientos.size());
@@ -457,17 +470,7 @@ public class SesionBusinessService {
         // 8. Actualizar Redis
         SesionDTO sesionActualizada = sesionMapper.toDto(sesion);
 
-        SesionRedisDTO sesionRedisActualizada = new SesionRedisDTO();
-        sesionRedisActualizada.setSesionId(sesionActualizada.getId());
-        sesionRedisActualizada.setEstado(sesionActualizada.getEstado());
-        sesionRedisActualizada.setExpiracion(Instant.now().plusSeconds(30 * 60));
-        sesionRedisActualizada.setUltimaActividad(sesionActualizada.getUltimaActividad());
-        if (sesionActualizada.getEvento() != null) {
-            sesionRedisActualizada.setEventoId(sesionActualizada.getEvento().getId());
-        }
-        if (sesionActualizada.getUsuario() != null) {
-            sesionRedisActualizada.setUserId(sesionActualizada.getUsuario().getId().toString());
-        }
+        SesionRedisDTO sesionRedisActualizada = sesionRedisMapper.toRedisDTO(sesionActualizada);
 
         sesionRedisService.guardarSesion(userId.toString(), sesionRedisActualizada);
         log.info("Nombres asignados exitosamente para sesión {}", sesion.getId());
@@ -518,8 +521,10 @@ public class SesionBusinessService {
         }
         // 5. Obtener evento
         Evento evento = sesion.getEvento();
+
         // 6. Calcular precio total (CORREGIDO: usar BigDecimal)
         BigDecimal precioTotal = evento.getPrecioEntrada().multiply(BigDecimal.valueOf(asientosSeleccionados.size()));
+
         // 7. Re-validar disponibilidad en Redis cátedra
         MatrizAsientosDTO matrizDisponibilidad = asientosDisponibilidadService.getDisponibilidadAsientos(
             evento.getId()
@@ -532,6 +537,7 @@ public class SesionBusinessService {
                 asiento.getFila(),
                 asiento.getColumna()
             );
+
             // Verificar que no fue vendido por otro usuario
             if (asientoDisp.getEstado() == EstadoAsiento.VENDIDO) {
                 throw new BadRequestAlertException(
@@ -540,11 +546,13 @@ public class SesionBusinessService {
                     "asientovendido"
                 );
             }
+
             // Si está DISPONIBLE (bloqueo expiró), necesita re-bloqueo
             if (asientoDisp.getEstado() == EstadoAsiento.DISPONIBLE) {
                 asientosParaReBloquear.add(new AsientoSimpleDTO(asiento.getFila(), asiento.getColumna()));
             }
         }
+
         // 8. Re-bloquear si es necesario
         if (!asientosParaReBloquear.isEmpty()) {
             log.info("Re-bloqueando {} asientos cuyo bloqueo expiró", asientosParaReBloquear.size());
@@ -560,20 +568,14 @@ public class SesionBusinessService {
                 );
             }
         }
-        // 9. Construir request de venta para cátedra
-        RealizarVentaRequestDTO ventaRequest = new RealizarVentaRequestDTO();
-        ventaRequest.setEventoId(evento.getIdCatedra());
-        ventaRequest.setFecha(Instant.now());
-        ventaRequest.setPrecioVenta(precioTotal);
-        List<AsientoVentaDTO> asientosVenta = new ArrayList<>();
-        for (AsientoSeleccionado asiento : asientosSeleccionados) {
-            AsientoVentaDTO asientoVentaDTO = new AsientoVentaDTO();
-            asientoVentaDTO.setFila(asiento.getFila());
-            asientoVentaDTO.setColumna(asiento.getColumna());
-            asientoVentaDTO.setPersona(asiento.getNombrePersona());
-            asientosVenta.add(asientoVentaDTO);
-        }
-        ventaRequest.setAsientos(asientosVenta);
+
+        // 9. Construir request de venta para cátedra usando mapper
+        RealizarVentaRequestDTO ventaRequest = ventaCatedraMapper.toRealizarVentaRequest(
+            evento,
+            precioTotal,
+            asientosSeleccionados
+        );
+
         // 10. Realizar venta en servidor de cátedra
         RealizarVentaResponseDTO ventaResponse;
         try {
@@ -582,14 +584,11 @@ public class SesionBusinessService {
             // Error de comunicación (timeout, 500, etc.)
             log.error("Error de comunicación al realizar venta: {}", e.getMessage());
             // Crear venta con estado PENDIENTE (permite re-intento)
-            Venta ventaPendiente = new Venta();
-            ventaPendiente.setUsuario(sesion.getUsuario());
-            ventaPendiente.setEvento(evento);
-            ventaPendiente.setIdVentaCatedra(null);
-            ventaPendiente.setFechaVenta(Instant.now());
-            ventaPendiente.setPrecioTotal(precioTotal);
-            ventaPendiente.setExitosa(false);
-            ventaPendiente.setEstadoSincronizacion(EstadoSincronizacion.PENDIENTE);
+            Venta ventaPendiente = ventaCreationHelper.crearVentaPendiente(
+                sesion.getUsuario(),
+                evento,
+                precioTotal
+            );
             ventaRepository.save(ventaPendiente);
             throw new BadRequestAlertException(
                 "Servidor de cátedra no disponible. Por favor, reintente en unos momentos.",
@@ -601,15 +600,13 @@ public class SesionBusinessService {
         if (Boolean.TRUE.equals(ventaResponse.getResultado())) {
             // ===== CASO A: VENTA EXITOSA =====
             log.info("Venta exitosa en cátedra con ID: {}", ventaResponse.getVentaId());
-            // Crear Venta entity
-            Venta venta = new Venta();
-            venta.setUsuario(sesion.getUsuario());
-            venta.setEvento(evento);
-            venta.setIdVentaCatedra(ventaResponse.getVentaId());
-            venta.setFechaVenta(Instant.now());
-            venta.setPrecioTotal(precioTotal);
-            venta.setExitosa(true);
-            venta.setEstadoSincronizacion(EstadoSincronizacion.SINCRONIZADA);
+            // Crear Venta entity usando helper
+            Venta venta = ventaCreationHelper.crearVentaExitosa(
+                sesion.getUsuario(),
+                evento,
+                ventaResponse.getVentaId(),
+                precioTotal
+            );
             venta = ventaRepository.save(venta);
             // Crear AsientoVendido entities
             List<AsientoVendido> asientosVendidos = new ArrayList<>();
@@ -636,14 +633,11 @@ public class SesionBusinessService {
             // ===== CASO B: VENTA RECHAZADA POR CÁTEDRA =====
             log.warn("Venta rechazada por cátedra: {}", ventaResponse.getDescripcion());
             // Crear Venta con estado ERROR (permite re-intento)
-            Venta ventaFallida = new Venta();
-            ventaFallida.setUsuario(sesion.getUsuario());
-            ventaFallida.setEvento(evento);
-            ventaFallida.setIdVentaCatedra(null);
-            ventaFallida.setFechaVenta(Instant.now());
-            ventaFallida.setPrecioTotal(precioTotal);
-            ventaFallida.setExitosa(false);
-            ventaFallida.setEstadoSincronizacion(EstadoSincronizacion.ERROR);
+            Venta ventaFallida = ventaCreationHelper.crearVentaRechazada(
+                sesion.getUsuario(),
+                evento,
+                precioTotal
+            );
             ventaRepository.save(ventaFallida);
             // NO actualizar sesión (mantener CARGA_DATOS para permitir re-intento)
             // NO eliminar de Redis
