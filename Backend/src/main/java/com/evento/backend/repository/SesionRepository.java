@@ -3,6 +3,8 @@ package com.evento.backend.repository;
 import com.evento.backend.domain.Sesion;
 import java.util.List;
 import java.util.Optional;
+
+import com.evento.backend.domain.enumeration.EstadoSesion;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.*;
@@ -16,6 +18,8 @@ import org.springframework.stereotype.Repository;
 public interface SesionRepository extends JpaRepository<Sesion, Long>, JpaSpecificationExecutor<Sesion> {
     @Query("select sesion from Sesion sesion where sesion.usuario.login = ?#{authentication.name}")
     List<Sesion> findByUsuarioIsCurrentUser();
+
+    Optional<Sesion> findFirstByUsuarioIdAndEstadoNot(Long userId, EstadoSesion estado);
 
     default Optional<Sesion> findOneWithEagerRelationships(Long id) {
         return this.findOneWithToOneRelationships(id);

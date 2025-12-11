@@ -1,5 +1,7 @@
 package com.evento.backend.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
@@ -33,8 +35,12 @@ public class RedisConfig {
             .setRetryAttempts(3)             // 3 reintentos si falla
             .setRetryInterval(1500);         // 1.5 segundos entre reintentos
 
-        // Codec JSON para serializar/deserializar objetos automáticamente
-        config.setCodec(new JsonJacksonCodec());
+        // Configurar ObjectMapper con soporte para Java 8 date/time types (Instant, LocalDateTime, etc.)
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        
+        // Codec JSON para serializar/deserializar objetos automáticamente con ObjectMapper configurado
+        config.setCodec(new JsonJacksonCodec(objectMapper));
 
         LOG.info("Configurando RedissonClient para Redis local: localhost:6379");
 
