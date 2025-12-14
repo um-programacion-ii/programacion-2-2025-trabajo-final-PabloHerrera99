@@ -267,6 +267,7 @@ public class SesionBusinessService {
      */
     public SesionDTO seleccionarAsientos(Long userId, List<AsientoSimpleDTO> asientos) {
         log.debug("Seleccionando {} asientos para usuario {}", asientos.size(), userId);
+
         // 1. Validar lista no vacía y límite máximo
         if (asientos == null || asientos.isEmpty()) {
             throw new BadRequestAlertException("Debe seleccionar al menos un asiento", "sesion", "noasientos");

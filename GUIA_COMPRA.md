@@ -34,7 +34,7 @@ echo "Token: $TOKEN"
 ```bash
 curl -s http://localhost:8081/api/eventos \
   -H "Authorization: Bearer $TOKEN" | \
-  jq '.[] | {id, titulo, fecha, precio: .precioEntrada, asientos: (.filaAsientos * .columnaAsientos)}'
+jq '.[] | {id, titulo, fecha, precio: .precioEntrada, asientos: (.filaAsientos * .columnaAsientos)}'
 ```
 
 **Anotar el `id` del evento que querés comprar**
@@ -43,7 +43,7 @@ curl -s http://localhost:8081/api/eventos \
 
 ```bash
 # Reemplazar 1054 con el ID del evento
-EVENTO_ID=1054
+EVENTO_ID=1051
 
 curl -s "http://localhost:8081/api/eventos/${EVENTO_ID}/asientos/disponibilidad" \
   -H "Authorization: Bearer $TOKEN" | jq .
@@ -86,8 +86,8 @@ curl -s -X POST http://localhost:8081/api/compra/asignar-nombres \
   -H "Content-Type: application/json" \
   -d '{
     "nombres": {
-      "20-9": "María García",
-      "20-10": "Carlos López"
+      "20-9": "test_06",
+      "20-10": "test_05"
     }
   }' | jq .
 ```
