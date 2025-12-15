@@ -21,4 +21,27 @@ sealed class Screen(val route: String) {
      * Ruta: "event_list"
      */
     data object EventList : Screen("event_list")
+
+    /**
+     * Pantalla de datos de evento.
+     * Ruta: "event"
+     */
+    data object EventDetail : Screen("events/{eventId}") {
+        fun createRoute(eventId: Long) = "events/$eventId"
+    }
+
+    /**
+     * Pantalla de lista de asientos disponibles.
+     */
+    data object SeatAvailability : Screen("events/{eventId}/seats") {
+        fun createRoute(eventId: Long) = "events/$eventId/seats"
+    }
+
+    /**
+     * Pantalla de asignación de nombres a tickets.
+     * Ruta: "sessions/{sessionId}/tickets"
+     */
+    data object TicketAssignment : Screen("sessions/{sessionId}/tickets") {
+        fun createRoute(sessionId: String) = "sessions/$sessionId/tickets"
+    }
 }
