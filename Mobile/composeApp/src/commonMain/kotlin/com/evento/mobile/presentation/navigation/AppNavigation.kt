@@ -9,8 +9,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.evento.mobile.data.remote.AuthApiService
 import com.evento.mobile.data.remote.EventApiService
+import com.evento.mobile.data.remote.PurchaseApiService
 import com.evento.mobile.data.repository.AuthRepository
 import com.evento.mobile.data.repository.EventRepository
+import com.evento.mobile.data.repository.PurchaseRepository
 import com.evento.mobile.di.HttpClientProvider
 import com.evento.mobile.presentation.screens.events.EventListScreen
 import com.evento.mobile.presentation.screens.events.EventListViewModel
@@ -18,6 +20,9 @@ import com.evento.mobile.presentation.screens.login.LoginScreen
 import com.evento.mobile.presentation.screens.login.LoginViewModel
 import com.evento.mobile.presentation.screens.detail.EventDetailScreen
 import com.evento.mobile.presentation.screens.detail.EventDetailViewModel
+import com.evento.mobile.presentation.screens.seats.SeatSelectionScreen
+import com.evento.mobile.presentation.screens.seats.SeatSelectionViewModel
+
 @Composable
 fun AppNavigation() {
 
@@ -39,11 +44,18 @@ fun AppNavigation() {
     // 5. Crear EventRepository con el EventApiService
     val eventRepository = EventRepository(eventApiService)
 
+    // 6. Crear PurchaseApiService con el HttpClient
+    val purchaseApiService = PurchaseApiService(httpClient)
+
+    // 7. Crear PurchaseRepository con el PurchaseApiService
+    val purchaseRepository = PurchaseRepository(purchaseApiService)
+
     // 6. Configurar el proveedor de token para HttpClient
     HttpClientProvider.setTokenProvider { authRepository.getToken() }
 
     // 7. Crear LoginViewModel con el AuthRepository
     val loginViewModel = LoginViewModel(authRepository)
+
     // Configuración de navegación
     NavHost(
         navController = navController,
@@ -60,6 +72,7 @@ fun AppNavigation() {
                 }
             )
         }
+
         // Ruta: "event_list"
         composable(Screen.EventList.route) {
             val eventListViewModel = EventListViewModel(eventRepository, authRepository)
@@ -76,6 +89,7 @@ fun AppNavigation() {
                 }
             )
         }
+
         // Event Detail
         composable(
             route = Screen.EventDetail.route,
@@ -99,5 +113,31 @@ fun AppNavigation() {
                 }
             )
         }
+
+            // Seat Selection
+            composable(
+                route = Screen.SeatAvailability.route,
+                arguments = listOf(
+                    navArgument("eventId") { type = NavType.LongType }
+                )
+            ) { backStackEntry ->
+                val eventId = backStackEntry.arguments?.getLong("eventId") ?: 0L
+
+                val viewModel = remember {
+                    SeatSelectionViewModel(
+                        eventRepository = eventRepository,
+                        purchaseRepository = purchaseRepository,
+                        eventoId = eventId
+                    )
+                }
+
+                SeatSelectionScreen(
+                    viewModel = viewModel,
+                    onNavigateBack = { navController.popBackStack() },
+                    onNavigateToTicketAssignment = { sessionId ->
+                        navController.navigate(Screen.TicketAssignment.createRoute(sessionId))
+                    }
+                )
+            }
+        }
     }
-}

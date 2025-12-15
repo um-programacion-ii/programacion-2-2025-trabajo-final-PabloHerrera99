@@ -36,4 +36,12 @@ sealed class Screen(val route: String) {
     data object SeatAvailability : Screen("events/{eventId}/seats") {
         fun createRoute(eventId: Long) = "events/$eventId/seats"
     }
+
+    /**
+     * Pantalla de asignación de nombres a tickets.
+     * Ruta: "sessions/{sessionId}/tickets"
+     */
+    data object TicketAssignment : Screen("sessions/{sessionId}/tickets") {
+        fun createRoute(sessionId: String) = "sessions/$sessionId/tickets"
+    }
 }
