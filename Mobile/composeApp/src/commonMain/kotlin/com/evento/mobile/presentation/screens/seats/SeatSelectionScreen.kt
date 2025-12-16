@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.evento.mobile.data.model.seat.AsientoDisponibilidadResponse
 import com.evento.mobile.data.model.seat.EstadoAsiento
+import com.evento.mobile.data.model.purchase.SeatCoordinates
 
 /**
  * Pantalla de selección de asientos.
@@ -33,7 +34,7 @@ import com.evento.mobile.data.model.seat.EstadoAsiento
 fun SeatSelectionScreen(
     viewModel: SeatSelectionViewModel,
     onNavigateBack: () -> Unit,
-    onNavigateToTicketAssignment: (String) -> Unit
+    onNavigateToTicketAssignment: (List<SeatCoordinates>) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val snackbarMessage by viewModel.snackbarMessage.collectAsState()
@@ -96,8 +97,8 @@ fun SeatSelectionScreen(
                         isBlocking = state.isBlocking,
                         onSeatClick = { seatId -> viewModel.toggleSeat(seatId) },
                         onContinueClick = {
-                            viewModel.blockSeatsAndContinue { sessionId ->
-                                onNavigateToTicketAssignment(sessionId)
+                            viewModel.blockSeatsAndContinue { selectedSeats ->
+                                onNavigateToTicketAssignment(selectedSeats)
                             }
                         }
                     )

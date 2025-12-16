@@ -27,4 +27,16 @@ class PurchaseRepository(private val apiService: PurchaseApiService) {
     suspend fun cancelSession(): NetworkResult<Unit> {
         return apiService.cancelSession()
     }
+
+    suspend fun assignNames(nombres: Map<String, String>): NetworkResult<SessionResponse> {
+        return apiService.assignNames(nombres)
+    }
+
+    /**
+     * Confirma la compra de los asientos seleccionados.
+     * Wrapper sobre apiService.confirmPurchase()
+     */
+    suspend fun confirmPurchase(): NetworkResult<VentaResponse> {
+        return apiService.confirmPurchase()
+    }
 }

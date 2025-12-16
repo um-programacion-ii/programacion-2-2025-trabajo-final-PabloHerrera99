@@ -1,5 +1,8 @@
 package com.evento.mobile.presentation.navigation
 
+import com.evento.mobile.data.model.purchase.SeatCoordinates
+import com.evento.mobile.presentation.screens.assignment.SeatWithName
+
 /**
  * Definición de rutas de navegación de la aplicación.
  *
@@ -41,7 +44,35 @@ sealed class Screen(val route: String) {
      * Pantalla de asignación de nombres a tickets.
      * Ruta: "sessions/{sessionId}/tickets"
      */
-    data object TicketAssignment : Screen("sessions/{sessionId}/tickets") {
-        fun createRoute(sessionId: String) = "sessions/$sessionId/tickets"
+    /**
+     * Pantalla de asignación de nombres a tickets.
+     * Ruta: "ticket_assignment/{seats}"
+     * Parámetro: seats codificados como "1-5,2-3,3-7" (comma-separated)
+     */
+    data object TicketAssignment : Screen("ticket_assignment/{seats}") {
+        fun createRoute(seats: List<SeatCoordinates>): String {
+            // Codificar como "1-5,2-3,3-7"
+            val encoded = seats.joinToString(",") { "${it.fila}-${it.columna}" }
+            return "ticket_assignment/$encoded"
+        }
+    }
+
+    /**
+    * Pantalla de confirmación de compra.
+    * Ruta: "purchase_confirmation/{seats}"
+    *
+    * Parámetro seats codificado como: "1-5-Juan Perez,2-3-Maria Lopez"
+    * Formato: "{fila}-{columna}-{nombre}" separados por comas
+    */
+    data object PurchaseConfirmation : Screen("purchase_confirmation/{seats}") {
+        fun createRoute(seats: List<SeatWithName>): String {
+            // Codificar asientos como "1-5-Juan,2-3-Maria"
+            // Eliminar comas del nombre para evitar conflictos
+            val encoded = seats.joinToString(",") { seat ->
+                val nombreSanitizado = seat.nombre.replace(",", "").trim()
+                "${seat.fila}-${seat.columna}-${nombreSanitizado}"
+            }
+            return "purchase_confirmation/$encoded"
+        }
     }
 }

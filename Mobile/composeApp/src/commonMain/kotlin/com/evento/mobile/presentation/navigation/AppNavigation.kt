@@ -13,7 +13,9 @@ import com.evento.mobile.data.remote.PurchaseApiService
 import com.evento.mobile.data.repository.AuthRepository
 import com.evento.mobile.data.repository.EventRepository
 import com.evento.mobile.data.repository.PurchaseRepository
+import com.evento.mobile.data.model.purchase.SeatCoordinates
 import com.evento.mobile.di.HttpClientProvider
+import com.evento.mobile.presentation.screens.assignment.SeatWithName
 import com.evento.mobile.presentation.screens.events.EventListScreen
 import com.evento.mobile.presentation.screens.events.EventListViewModel
 import com.evento.mobile.presentation.screens.login.LoginScreen
@@ -22,6 +24,10 @@ import com.evento.mobile.presentation.screens.detail.EventDetailScreen
 import com.evento.mobile.presentation.screens.detail.EventDetailViewModel
 import com.evento.mobile.presentation.screens.seats.SeatSelectionScreen
 import com.evento.mobile.presentation.screens.seats.SeatSelectionViewModel
+import com.evento.mobile.presentation.screens.assignment.TicketAssignmentScreen
+import com.evento.mobile.presentation.screens.assignment.TicketAssignmentViewModel
+import com.evento.mobile.presentation.screens.confirmation.PurchaseConfirmationScreen
+import com.evento.mobile.presentation.screens.confirmation.PurchaseConfirmationViewModel
 
 @Composable
 fun AppNavigation() {
@@ -114,30 +120,108 @@ fun AppNavigation() {
             )
         }
 
-            // Seat Selection
-            composable(
-                route = Screen.SeatAvailability.route,
-                arguments = listOf(
-                    navArgument("eventId") { type = NavType.LongType }
-                )
-            ) { backStackEntry ->
-                val eventId = backStackEntry.arguments?.getLong("eventId") ?: 0L
+        // Seat Selection
+        composable(
+            route = Screen.SeatAvailability.route,
+            arguments = listOf(
+                navArgument("eventId") { type = NavType.LongType }
+            )
+        ) { backStackEntry ->
+            val eventId = backStackEntry.arguments?.getLong("eventId") ?: 0L
 
-                val viewModel = remember {
-                    SeatSelectionViewModel(
-                        eventRepository = eventRepository,
-                        purchaseRepository = purchaseRepository,
-                        eventoId = eventId
-                    )
-                }
-
-                SeatSelectionScreen(
-                    viewModel = viewModel,
-                    onNavigateBack = { navController.popBackStack() },
-                    onNavigateToTicketAssignment = { sessionId ->
-                        navController.navigate(Screen.TicketAssignment.createRoute(sessionId))
-                    }
+            val viewModel = remember {
+                SeatSelectionViewModel(
+                    eventRepository = eventRepository,
+                    purchaseRepository = purchaseRepository,
+                    eventoId = eventId
                 )
             }
+
+            SeatSelectionScreen(
+                viewModel = viewModel,
+                onNavigateBack = { navController.popBackStack() },
+                onNavigateToTicketAssignment = { selectedSeats ->
+                    navController.navigate(Screen.TicketAssignment.createRoute(selectedSeats))
+                }
+            )
+        }
+
+        // Ticket Assignment
+        composable(
+            route = "ticket_assignment/{seats}",
+            arguments = listOf(
+                navArgument("seats") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val seatsEncoded = backStackEntry.arguments?.getString("seats") ?: ""
+
+            // Decodificar "1-5,2-3,3-7" -> List<SeatCoordinates>
+            val selectedSeats = seatsEncoded.split(",").mapNotNull { seatStr ->
+                val parts = seatStr.split("-")
+                if (parts.size == 2) {
+                    SeatCoordinates(
+                        fila = parts[0].toIntOrNull() ?: 0,
+                        columna = parts[1].toIntOrNull() ?: 0
+                    )
+                } else null
+            }
+
+            val viewModel = remember {
+                TicketAssignmentViewModel(
+                    purchaseRepository = purchaseRepository,
+                    selectedSeats = selectedSeats
+                )
+            }
+
+            TicketAssignmentScreen(
+                viewModel = viewModel,
+                onBack = { navController.popBackStack() },
+                onContinue = { seats ->  // ← Recibir asientos
+                    navController.navigate(
+                        Screen.PurchaseConfirmation.createRoute(seats)  // ← Usar createRoute
+                    ) {
+                        popUpTo(Screen.EventList.route)
+                    }
+                }
+            )
+        }
+
+        // Purchase Confirmation
+        composable(
+            route = Screen.PurchaseConfirmation.route,
+            arguments = listOf(
+                navArgument("seats") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val seatsEncoded = backStackEntry.arguments?.getString("seats") ?: ""
+
+            // Decodificar "1-5-Juan,2-3-Maria" -> List<SeatWithName>
+            val selectedSeats = seatsEncoded.split(",").mapNotNull { seatStr ->
+                val parts = seatStr.split("-")
+                if (parts.size >= 3) {
+                    SeatWithName(
+                        fila = parts[0].toIntOrNull() ?: 0,
+                        columna = parts[1].toIntOrNull() ?: 0,
+                        nombre = parts.drop(2).joinToString("-") // Por si el nombre tenía guiones
+                    )
+                } else null
+            }
+
+            val viewModel = remember {
+                PurchaseConfirmationViewModel(
+                    purchaseRepository = purchaseRepository,
+                    selectedSeats = selectedSeats
+                )
+            }
+
+            PurchaseConfirmationScreen(
+                viewModel = viewModel,
+                onNavigateToEventList = {
+                    navController.navigate(Screen.EventList.route) {
+                        popUpTo(Screen.EventList.route) { inclusive = true }
+                    }
+                }
+            )
         }
     }
+}
