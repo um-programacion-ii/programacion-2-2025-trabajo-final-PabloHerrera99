@@ -158,6 +158,91 @@ class PurchaseApiService(private val httpClient: HttpClient) {
     }
 
     /**
+     * Asigna nombres a los asientos seleccionados.
+     *
+     * @param nombres Map de "fila-columna" -> "Nombre Completo"
+     * @return NetworkResult con sesión actualizada o error
+     */
+    suspend fun assignNames(nombres: Map<String, String>): NetworkResult<SessionResponse> {
+        return try {
+            val response = httpClient.post(Endpoints.COMPRA_ASIGNAR_NOMBRES) {
+                contentType(ContentType.Application.Json)
+                setBody(AssignNamesRequest(nombres))
+            }
+            when (response.status) {
+                HttpStatusCode.OK -> {
+                    NetworkResult.Success(response.body<SessionResponse>())
+                }
+                HttpStatusCode.BadRequest -> {
+                    NetworkResult.Error("Nombres inválidos o incompletos", 400)
+                }
+                HttpStatusCode.Unauthorized -> {
+                    NetworkResult.Error("Sesión expirada", 401)
+                }
+                else -> {
+                    NetworkResult.Error(
+                        "Error al asignar nombres: ${response.status.description}",
+                        response.status.value
+                    )
+                }
+            }
+        } catch (e: Exception) {
+            NetworkResult.Error(parseNetworkError(e))
+        }
+    }
+
+    /**
+     * Confirma la compra final de los asientos.
+     *
+     * Endpoint: POST /api/compra/confirmar
+     * Request: Ninguno (usa sesión del usuario autenticado)
+     * Response: VentaDTO con el resultado de la venta
+     *
+     * Validaciones del backend:
+     * - Debe haber asientos seleccionados
+     * - Todos los asientos deben tener nombre asignado
+     * - Los bloqueos deben seguir vigentes (o se re-bloquean)
+     *
+     * @return NetworkResult con VentaResponse o error
+     */
+    suspend fun confirmPurchase(): NetworkResult<VentaResponse> {
+        return try {
+            val response = httpClient.post(Endpoints.COMPRA_CONFIRMAR) {
+                contentType(ContentType.Application.Json)
+                // No se envía body - usa la sesión del usuario autenticado
+            }
+            when (response.status) {
+                HttpStatusCode.OK -> {
+                    NetworkResult.Success(response.body<VentaResponse>())
+                }
+                HttpStatusCode.BadRequest -> {
+                    NetworkResult.Error(
+                        "No hay asientos seleccionados o faltan nombres asignados",
+                        400
+                    )
+                }
+                HttpStatusCode.Conflict -> {
+                    NetworkResult.Error(
+                        "Sesión expirada o asientos ya vendidos por otro usuario",
+                        409
+                    )
+                }
+                HttpStatusCode.Unauthorized -> {
+                    NetworkResult.Error("Sesión expirada. Por favor inicia sesión nuevamente", 401)
+                }
+                else -> {
+                    NetworkResult.Error(
+                        "Error al confirmar compra: ${response.status.description}",
+                        response.status.value
+                    )
+                }
+            }
+        } catch (e: Exception) {
+            NetworkResult.Error(parseNetworkError(e))
+        }
+    }
+
+    /**
      * Parser de errores de red genérico.
      * Convierte excepciones técnicas en mensajes user-friendly.
      */

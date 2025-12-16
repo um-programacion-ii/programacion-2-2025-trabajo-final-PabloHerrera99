@@ -115,7 +115,7 @@ class SeatSelectionViewModel(
      *
      * @param onSuccess Callback con sessionId si el bloqueo fue exitoso
      */
-    fun blockSeatsAndContinue(onSuccess: (String) -> Unit) {
+    fun blockSeatsAndContinue(onSuccess: (List<SeatCoordinates>) -> Unit) {
         val currentState = _uiState.value
         if (currentState !is SeatSelectionUiState.Success) return
 
@@ -135,7 +135,7 @@ class SeatSelectionViewModel(
 
             when (val result = purchaseRepository.selectSeats(seats)) {
                 is NetworkResult.Success -> {
-                    onSuccess(currentState.sessionId)
+                    onSuccess(seats)
                 }
                 is NetworkResult.Error -> {
                     _uiState.value = currentState.copy(isBlocking = false)
