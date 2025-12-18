@@ -43,7 +43,7 @@ jq '.[] | {id, titulo, fecha, precio: .precioEntrada, asientos: (.filaAsientos *
 
 ```bash
 # Reemplazar 1054 con el ID del evento
-EVENTO_ID=1051
+EVENTO_ID=1055
 
 curl -s "http://localhost:8081/api/eventos/${EVENTO_ID}/asientos/disponibilidad" \
   -H "Authorization: Bearer $TOKEN" | jq .

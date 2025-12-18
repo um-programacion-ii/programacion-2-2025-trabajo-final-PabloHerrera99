@@ -9,6 +9,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
+
 /**
  * Servicio para notificar al Backend cuando hay cambios en eventos (vía Kafka).
  *
@@ -70,17 +71,17 @@ public class BackendNotificationService {
             }
 
         } catch (HttpClientErrorException e) {
-            log.error("✗ Error HTTP del Backend (4xx): {} - {}",
+            log.error("Error HTTP del Backend (4xx): {} - {}",
                 e.getStatusCode(), e.getResponseBodyAsString());
             log.error("  No se pudo completar la sincronización");
 
         } catch (HttpServerErrorException e) {
-            log.error("✗ Error interno del Backend (5xx): {} - {}",
+            log.error("Error interno del Backend (5xx): {} - {}",
                 e.getStatusCode(), e.getResponseBodyAsString());
             log.error("  Backend no pudo procesar la sincronización");
 
         } catch (ResourceAccessException e) {
-            log.error("✗ Backend no disponible (timeout/connection refused)");
+            log.error("Backend no disponible (timeout/connection refused)");
             log.error("  Mensaje: {}", e.getMessage());
             log.error("  Verificar que Backend esté corriendo en: {}", backendBaseUrl);
 

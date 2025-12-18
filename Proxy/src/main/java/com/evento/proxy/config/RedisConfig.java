@@ -8,7 +8,7 @@ import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
 /**
- * Configuration for Redis connection to Cátedra server.
+ * Configuración de conexión a Redis Cátedra.
  */
 @Configuration
 public class RedisConfig {
@@ -24,16 +24,16 @@ public class RedisConfig {
     @Bean
     public JedisPool jedisPool() {
         ApplicationProperties.Redis.Catedra catedraConfig = applicationProperties.getRedis().getCatedra();
-        
+
         JedisPoolConfig poolConfig = new JedisPoolConfig();
         poolConfig.setMaxTotal(10);
         poolConfig.setMaxIdle(5);
         poolConfig.setMinIdle(1);
         poolConfig.setTestOnBorrow(true);
-        
-        log.info("Configuring Redis connection to Cátedra: {}:{}", 
+
+        log.info("Configuring Redis connection to Cátedra: {}:{}",
             catedraConfig.getHost(), catedraConfig.getPort());
-        
+
         return new JedisPool(
             poolConfig,
             catedraConfig.getHost(),
