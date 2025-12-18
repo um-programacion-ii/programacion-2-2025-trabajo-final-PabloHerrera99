@@ -200,19 +200,19 @@ public class EventoSyncService {
         evento.setFecha(dto.getFecha());
         evento.setImagen(dto.getImagen());
         evento.setFilaAsientos(dto.getFilaAsientos());
-        evento.setColumnaAsientos(dto.getColumnaAsientos());  // Nota: campo renombrado en DTO
+        evento.setColumnaAsientos(dto.getColumnaAsientos());
         evento.setPrecioEntrada(dto.getPrecioEntrada());
-        evento.setActivo(true);  // Siempre activo si viene desde cátedra
+        evento.setActivo(true);
         evento.setEventoTipo(tipo);
 
         // Guardar en base de datos
         Evento eventoGuardado = eventoRepository.save(evento);
 
         if (esNuevo) {
-            log.info("✓ Evento creado: ID={}, idCatedra={}, titulo='{}'",
+            log.info("Evento creado: ID={}, idCatedra={}, titulo='{}'",
                 eventoGuardado.getId(), dto.getId(), dto.getTitulo());
         } else {
-            log.debug("✓ Evento actualizado: ID={}, idCatedra={}",
+            log.debug("Evento actualizado: ID={}, idCatedra={}",
                 eventoGuardado.getId(), dto.getId());
         }
 

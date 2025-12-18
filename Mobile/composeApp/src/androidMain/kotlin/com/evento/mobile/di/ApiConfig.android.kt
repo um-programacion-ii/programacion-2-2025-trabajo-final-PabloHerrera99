@@ -16,5 +16,5 @@ package com.evento.mobile.di
  * - 10.0.2.15     → IP del emulador mismo
  */
 actual object ApiConfig {
-    actual val BASE_URL: String = "http://10.0.2.2:8081"
+    actual val BASE_URL: String ="http://192.168.1.48:8081" //"http://10.0.2.2:8081"
 }

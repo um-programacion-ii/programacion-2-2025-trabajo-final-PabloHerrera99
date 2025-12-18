@@ -74,7 +74,7 @@ spring:
         client.dns.lookup: use_all_dns_ips
 server:
   port: 8082
-  # make sure requests the proxy uri instead of the server one
+  address: 0.0.0.0
   forward-headers-strategy: native
 
 # ===================================================================
