@@ -1,6 +1,8 @@
 package com.evento.proxy.web.rest;
 
 import com.evento.proxy.service.ConsultarAsientosService;
+import com.evento.proxy.security.SecurityUtils;
+import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -31,21 +33,30 @@ public class ProxyController {
      *         or status 404 (Not Found) if the event doesn't exist
      */
     @GetMapping(value = "/asientos/{eventoId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> obtenerAsientos(@PathVariable Long eventoId) {
+    public ResponseEntity<String> obtenerAsientos(
+        @PathVariable Long eventoId,
+        HttpServletRequest request
+    ) {
+        // Obtener usuario autenticado
+        String username = SecurityUtils.getCurrentUserLogin().orElse("anonymous");
+        String ipAddress = request.getRemoteAddr();
+
         log.debug("REST request to get seats for event: {}", eventoId);
-        
+        log.info("AUDIT: Consulta asientos - Evento: {}, Usuario: {}, IP: {}",
+            eventoId, username, ipAddress);
+
         try {
             String asientos = consultarAsientosService.obtenerAsientos(eventoId);
-            
+
             if (asientos == null) {
                 log.debug("Event {} not found in Redis", eventoId);
                 return ResponseEntity.notFound().build();
             }
-            
+
             return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(asientos);
-                
+
         } catch (Exception e) {
             log.error("Error retrieving seats for event {}: {}", eventoId, e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();

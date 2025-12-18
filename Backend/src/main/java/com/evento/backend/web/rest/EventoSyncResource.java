@@ -2,6 +2,7 @@ package com.evento.backend.web.rest;
 
 import com.evento.backend.service.EventoSyncService;
 import com.evento.backend.service.EventoSyncService.SyncResult;
+import com.evento.backend.security.SecurityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -32,6 +33,9 @@ public class EventoSyncResource {
      */
     @PostMapping("/sincronizar-todo")
     public ResponseEntity<EventoSyncService.SyncResult> sincronizarTodo() {
+
+        String caller = SecurityUtils.getCurrentUserLogin().orElse("unknown");
+
         log.info("=================================================");
         log.info("SOLICITUD DE SINCRONIZACIÓN COMPLETA RECIBIDA");
         log.info("=================================================");

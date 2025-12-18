@@ -27,9 +27,11 @@ public class BackendNotificationService {
     private String backendBaseUrl;
 
     private final RestTemplate restTemplate;
+    private final BackendAuthService backendAuthService;
 
     public BackendNotificationService() {
         this.restTemplate = new RestTemplate();
+        this.backendAuthService = new BackendAuthService();
     }
 
     /**
@@ -44,15 +46,20 @@ public class BackendNotificationService {
         try {
             log.debug("URL destino: {}", url);
 
-            // Configurar headers
+            // Obtener token JWT de servicio
+            String token = backendAuthService.getValidToken();
+            log.debug("Token obtenido para autenticación con Backend");
+
+            // Configurar headers con autenticación
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.setBearerAuth(token);
 
             // Crear request vacío (endpoint no requiere body)
             HttpEntity<Void> entity = new HttpEntity<>(headers);
 
             // Hacer POST al Backend
-            log.info("Enviando POST a Backend: {}", url);
+            log.info("Enviando POST a Backend con autenticación: {}", url);
 
             ResponseEntity<String> response = restTemplate.exchange(
                 url,

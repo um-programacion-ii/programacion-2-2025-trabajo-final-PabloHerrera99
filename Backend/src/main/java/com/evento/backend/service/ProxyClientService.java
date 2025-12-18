@@ -41,9 +41,21 @@ public class ProxyClientService {
      */
     private String obtenerTokenActual() {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication instanceof JwtAuthenticationToken jwtAuth) {
-            return jwtAuth.getToken().getTokenValue();
+
+        // Validación de autenticación
+        if (authentication == null || !authentication.isAuthenticated()) {
+            log.error("Intento de llamar al Proxy sin autenticación válida");
+            throw new RuntimeException("Usuario no autenticado para llamar al Proxy");
         }
+
+        // Validación de tipo de autenticación JWT
+        if (authentication instanceof JwtAuthenticationToken jwtAuth) {
+            String token = jwtAuth.getToken().getTokenValue();
+            log.debug("Token JWT obtenido para usuario: {}", authentication.getName());
+            return token;
+        }
+
+        log.error("Autenticación no es de tipo JWT: {}", authentication.getClass().getName());
         throw new RuntimeException("No se pudo obtener el token JWT del contexto de seguridad");
     }
 
