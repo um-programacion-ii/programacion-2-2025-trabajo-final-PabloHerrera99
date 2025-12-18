@@ -87,24 +87,33 @@ public class ApplicationProperties {
     }
 
     public static class Backend {
-
         private String baseUrl = "http://localhost:8081";
         private int timeout = 5000;
-
+        private String serviceUsername = "proxy-service";
+        private String servicePassword = "user";
         public String getBaseUrl() {
             return baseUrl;
         }
-
         public void setBaseUrl(String baseUrl) {
             this.baseUrl = baseUrl;
         }
-
         public int getTimeout() {
             return timeout;
         }
-
         public void setTimeout(int timeout) {
             this.timeout = timeout;
+        }
+        public String getServiceUsername() {
+            return serviceUsername;
+        }
+        public void setServiceUsername(String serviceUsername) {
+            this.serviceUsername = serviceUsername;
+        }
+        public String getServicePassword() {
+            return servicePassword;
+        }
+        public void setServicePassword(String servicePassword) {
+            this.servicePassword = servicePassword;
         }
     }
     // jhipster-needle-application-properties-property-class

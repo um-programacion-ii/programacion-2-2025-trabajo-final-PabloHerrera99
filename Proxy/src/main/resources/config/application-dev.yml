@@ -126,3 +126,5 @@ application:
       timeout: 2000
   backend:
     base-url: http://localhost:8081
+    service-username: proxy-service
+    service-password: user
