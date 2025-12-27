@@ -1,0 +1,17 @@
+# This configuration is intended for development purpose, it's **your** responsibility to harden it for production
+name: finalprogramacion
+services:
+  postgresql:
+    extends:
+      file: ./postgresql.yml
+      service: postgresql
+    profiles:
+      - ''
+      - prod
+  redis:
+    extends:
+      file: ./redis.yml
+      service: redis
+
+volumes:
+  redis-data:

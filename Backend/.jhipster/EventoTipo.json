@@ -1,0 +1,26 @@
+{
+  "annotations": {
+    "changelogDate": "20251203202858"
+  },
+  "applications": "*",
+  "documentation": "Entidad 1: EventoTipo\\nTabla de catálogo con tipos de eventos (Conferencia, Teatro, Curso, etc.)",
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "nombre",
+      "fieldType": "String",
+      "fieldValidateRules": ["required", "maxlength"],
+      "fieldValidateRulesMaxlength": "50"
+    },
+    {
+      "fieldName": "descripcion",
+      "fieldType": "String",
+      "fieldValidateRules": ["maxlength"],
+      "fieldValidateRulesMaxlength": "200"
+    }
+  ],
+  "name": "EventoTipo",
+  "relationships": [],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

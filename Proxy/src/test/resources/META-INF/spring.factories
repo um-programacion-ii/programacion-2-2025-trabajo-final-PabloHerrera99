@@ -1,0 +1,2 @@
+org.springframework.test.context.ContextCustomizerFactory = \
+    com.evento.proxy.config.SqlTestContainersSpringContextCustomizerFactory
